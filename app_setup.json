@@ -1,0 +1,39 @@
+{
+  "app": {
+    "host": "127.0.0.1",
+    "port": 80,
+    "domain": "http://127.0.0.1:80",
+    "domain_description": "part of links files in database",
+    "backend_api_prefix": "",
+    "backend_api_prefix_description": "sets global prefix for all endpoints, example: ip:port/prefix/endpointName,  leave empty for ip:port/endpointName",
+    "access_token_ttl": 9000,
+    "refresh_token_ttl": 9000,
+    "token_secret": "TOKEN-SECRET-KEY",
+    "smtp_mail": "testemailsssender@gmail.com",
+    "smtp_host": "smtp.gmail.com",
+    "smtp_port": 465,
+    "smtp_tls": true,
+    "smtp_secure": true,
+    "smtp_user": "testemailsssender@gmail.com",
+    "smtp_pass": "aabzfwtsstwuygfa",
+    "aws_region": "us-east-2",
+    "aws_access_key_id": "AKIAQIXISIKEYZPLNNTF",
+    "aws_secret_access_key": "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",
+    "aws_public_bucket_name": "social-voice-app"
+  },
+  
+  "database1": {
+    "database_address": "jdbc:postgresql://ds-database-1.crrqe8hk084t.us-east-2.rds.amazonaws.com",
+    "database_port": 6432,
+    "database_name": "social_voice",
+    "database_login": "postgres",
+    "database_password": "postgres"
+  },
+  "database": {
+    "database_address": "127.0.0.1",
+    "database_port": 6432,
+    "database_name": "social_voice",
+    "database_login": "postgres",
+    "database_password": "postgres"
+  }
+}
