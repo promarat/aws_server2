@@ -3,20 +3,10 @@ import { IsDate, IsDateString, Max, MaxLength, Min, MinLength } from "class-vali
 import { GenderEnum } from "../../lib/enum";
 import { ApiModelProperty } from "@nestjs/swagger/dist/decorators/api-model-property.decorator";
 
-export class CompleteRegisterDto {
+export class EmailVerify {
 
-  @ApiProperty({example: "Jack"})
+  @ApiProperty({example: "123456"})
   @MinLength(3)
   @MaxLength(20)
-  name: string;
-
-  @ApiProperty({example: new Date()})
-  @IsDateString()
-  dob: Date;
-
-  @ApiProperty({example: 'Ukraine'})
-  country: string;
-
-  @ApiProperty()
-  gender: string;
+  pseudo: string;
 }

@@ -16,7 +16,7 @@ import { ExtractJwt } from "passport-jwt";
 import { AuthService } from "./auth.service";
 import { MailService } from "../mail/mail.service";
 import { TokenService } from "./token/token.service";
-import { ApiBearerAuth, ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { ForgotPassRequest } from "./dto/forgot-pass.request";
 import { RecoverRequest, ResetRequest } from "./dto/recover.request";
 import { LoginResponse } from "./dto/login.response";
@@ -45,7 +45,7 @@ export class AuthController {
     @Res() res,
     @Body() loginReq: LoginRequest
   ): Promise<LoginResponse> {
-    const reqIp = req.headers["x-real-ip"] || req.connection.remoteAddress;
+    const reqIp = ""; //req.headers["x-real-ip"] || req.connection.remoteAddress;
     return await this.authService.register(loginReq, reqIp)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
@@ -59,7 +59,7 @@ export class AuthController {
     @Res() res,
     @Body() loginReq: LoginRequest
   ): Promise<LoginResponse> {
-    const reqIp = req.headers["x-real-ip"] || req.connection.remoteAddress;
+    const reqIp = '';//req.headers["x-real-ip"] || req.connection.remoteAddress;
     const user = req.user;
     return await this.authService.login(loginReq, reqIp, user)
       .then((data) => res.json(data))
@@ -77,8 +77,9 @@ export class AuthController {
     @Req() req,
     @Res() res
   ): Promise<LoginResponse> {
-    const reqIp = req.headers["x-real-ip"] || req.connection.remoteAddress;
+    const reqIp = ""; //req.headers["x-real-ip"] || req.connection.remoteAddress;
     const oldAccessToken = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+    console.log(oldAccessToken);
     return await this.tokenService.getAccessTokenFromRefreshToken(refreshToken, oldAccessToken, reqIp)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
@@ -178,8 +179,6 @@ export class AuthController {
     @Res() res,
     @Body() requestbody: SubScribeRequest,
   ): Promise<SubScribeRequest> {
-    console.log(requestbody);
-    console.log(requestbody.email);
     return await this.subScribeService.addSubScribe(requestbody)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));

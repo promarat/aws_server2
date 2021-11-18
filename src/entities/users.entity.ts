@@ -32,6 +32,15 @@ export class UsersEntity {
   @Column({ unique: true })
   email: string;
 
+  @Column({ default: null })
+  name: string;
+
+  @Column({ default: null })
+  firstname: string;
+
+  @Column({ default: null })
+  lastname: string;
+
   @Column({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP"

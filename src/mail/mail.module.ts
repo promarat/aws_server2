@@ -13,7 +13,7 @@ import { ConfigService } from 'nestjs-config';
             {
               pool: true,
               host: configService.get('app.smtp_host'),
-              port: configService.get('app.smtp_port'),
+              // port: configService.get('app.smtp_port'),
               ignoreTLS: configService.get('app.smtp_tls'),
               secure: configService.get('app.smtp_secure'),
               auth: {

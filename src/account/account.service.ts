@@ -1,10 +1,13 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import { CompleteRegisterDto } from "./dto/complete-register.dto";
 import { RecordsService } from "../records/records.service";
 import { FileService } from "../files/file.service";
 import { FileTypeEnum } from "../lib/enum";
 import { GenderEnum } from "../lib/enum";
+import { EmailVerify } from "./dto/emailverify.dto";
+import { find } from "rxjs";
+import { UsersEntity } from "src/entities/users.entity";
 
 @Injectable()
 export class AccountService {
@@ -22,13 +25,14 @@ export class AccountService {
     return { ...userData, ...limitData };
   }
 
-  async updateProfile(user, body: CompleteRegisterDto) {
+  async updateProfile(user: UsersEntity, body: CompleteRegisterDto) {
     const findUser = await this.usersService.findById(user.id);
-    findUser.pseudo = body.pseudo;
+    // findUser.pseudo = body.pseudo;
     findUser.dob = body.dob;
     findUser.updatedAt = new Date();
     findUser.country = body.country;
     findUser.gender = <GenderEnum>body.gender;
+    findUser.name = body.name;
     findUser.isProfileCompleted = true;
     return this.usersService.completeRegister(findUser);
   }
@@ -42,4 +46,15 @@ export class AccountService {
     });
     return avatar;
   }
+
+  async emailVerify(user, body: EmailVerify) {
+    const findUser = await this.usersService.findById(user.id);
+    if (findUser.pseudo == body.pseudo){
+      findUser.isEmailVerified = true;
+      return this.usersService.completeRegister(findUser);
+    }
+    else
+      throw new BadRequestException("Email Verify Faild");
+  }
+
 }

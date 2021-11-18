@@ -25,6 +25,7 @@ import { AvatarDto } from "./dto/avatar.dto";
 import { AccountMeResponse } from "./dto/account-me.response";
 import { UsersResponse } from "../users/dto/users.response";
 import { FileResponse } from "../files/dto/file.response";
+import { EmailVerify } from "./dto/emailverify.dto";
 
 @Controller("account")
 @ApiBearerAuth()
@@ -52,7 +53,7 @@ export class AccountController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
-  @Put()
+  @Put("completeregister")
   @ApiCreatedResponse({ status: HttpStatus.CREATED, type: UsersResponse, description: "The file has been uploaded" })
   @ApiUnauthorizedResponse()
   async completeRegister(
@@ -60,11 +61,28 @@ export class AccountController {
     @Res() res,
     @Body() body: CompleteRegisterDto
   ) {
+    console.log(CompleteRegisterDto);
     const user = req.user;
     return this.accountService.updateProfile(user, body)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
+
+  @Post("emailverify")
+  @ApiCreatedResponse({ status: HttpStatus.CREATED,  description: "" })
+  @ApiUnauthorizedResponse()
+  async emailVerify(
+    @Res() res,
+    @Req() req,
+    @Body() body: EmailVerify
+  ) {
+    const user = req.user;
+    // const isSent = await this.authService.findRecoverRecord(request.email);
+    return this.accountService.emailVerify(user, body)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
 
   @Post("avatar")
   @ApiConsumes("multipart/form-data")
@@ -78,6 +96,8 @@ export class AccountController {
     @UploadedFile() file,
     @Body() body: AvatarDto
   ) {
+    console.log("avatar file--", file);
+    console.log("avatar body--", body);
     const user = req.user;
     return this.accountService.addAvatar(user.id, file.buffer, file.originalname)
       .then((data) => res.json(data))

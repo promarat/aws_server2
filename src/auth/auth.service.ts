@@ -7,12 +7,15 @@ import { TokenService } from "./token/token.service";
 import { PasswordResetEntity } from "../entities/reset-password.entity";
 import { GeneratorUtil } from "../lib/generator-util";
 import { UsersEntity } from "../entities/users.entity";
+import { MailService } from "../mail/mail.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private tokenService: TokenService,
+    private mailService: MailService,
+
     @InjectRepository(PasswordResetEntity) private passwordResetRepository: Repository<PasswordResetEntity>
   ) {
   }
@@ -29,10 +32,13 @@ export class AuthService {
     newUser.isActive = true;
     newUser.isEmailVerified = false;
     newUser.updatedAt = new Date();
+    newUser.pseudo = (Math.floor(Math.random() * 100000) + 100000) + "";
     const createUser = await this.usersService.createUser(newUser)
+
+    // this.mailService.sentVerificationCode(newUser.pseudo, newUser.email);
     return this.login(credentials, ip, createUser)
   }
-
+  
   async login(credentials, ipAddress: string, user): Promise<LoginResponse> {
     const payload: any = {
       username: user.username,
