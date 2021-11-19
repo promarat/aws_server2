@@ -1,6 +1,6 @@
 {
   "app": {
-    "host": "https://ec2-13-58-52-193.us-east-2.compute.amazonaws.com",
+    "host": "https://ec2-3-23-96-142.us-east-2.compute.amazonaws.com",
     "port": 80,
     "domain": "https://main.d1qk4b11ey8dra.amplifyapp.com",
     "domain_description": "part of links files in database",
