@@ -26,7 +26,7 @@ import { join } from 'path';
               },
             },
         template: {
-          dir: '', //join(__dirname, '/template'),
+          dir: join(__dirname, 'template'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
