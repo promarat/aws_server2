@@ -12,11 +12,11 @@ import { join } from 'path';
       useFactory: (configService: ConfigService) => ({
         transport:
             {
-              pool: true,
+              // pool: true,
               host: configService.get('app.smtp_host'),
               // port: configService.get('app.smtp_port'),
               // ignoreTLS: configService.get('app.smtp_tls'),
-              secure: configService.get('app.smtp_secure'),
+              // secure: configService.get('app.smtp_secure'),
               auth: {
                 user: configService.get('app.smtp_user'),
                 pass: configService.get('app.smtp_pass'),
