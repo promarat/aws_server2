@@ -10,7 +10,7 @@
     "refresh_token_ttl": 9000,
     "token_secret": "TOKEN-SECRET-KEY",
     "smtp_mail": "daniyarsarsenov19121995@gmail.com",
-    "smtp_host": "smtp.example.com",
+    "smtp_host": "smtp.gmail.com",
     "smtp_port": 465,
     "smtp_tls": true,
     "smtp_secure": false,
