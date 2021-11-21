@@ -35,6 +35,7 @@
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
+    "googleapis": "^91.0.0",
     "install": "^0.13.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",

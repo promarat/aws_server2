@@ -79,7 +79,7 @@ export class AuthController {
   ): Promise<LoginResponse> {
     const reqIp = ""; //req.headers["x-real-ip"] || req.connection.remoteAddress;
     const oldAccessToken = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-    console.log(oldAccessToken);
+    console.log("refresh-- oldAccessToken", oldAccessToken);
     return await this.tokenService.getAccessTokenFromRefreshToken(refreshToken, oldAccessToken, reqIp)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
@@ -127,7 +127,7 @@ export class AuthController {
       .catch((error) => res.status(error.statusCode).send(error.response));
   }
 
-  @Post("recover")
+  @Post("resetpassword")
   @ApiQuery({ name: "token", type: String, required: true })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Wrong token" })
   @ApiResponse({ status: HttpStatus.OK, description: "Password was changed" })

@@ -28,8 +28,14 @@ export class RecordsEntity {
   @Column({ nullable: true })
   emoji: string;
 
+  @Column({ nullable: false })
+  category: string;
+
   @Column({ nullable: true })
   duration: string;
+
+  @Column({ type: "boolean", default: false })
+  privacy: boolean;
 
   @Column({ nullable: true , default: 0})
   likesCount: number

@@ -31,7 +31,9 @@ export class TokenService {
 
   async getAccessTokenFromRefreshToken(reqRefreshToken: string, oldAccessToken: string, ipAddress: string): Promise<any> {
     try {
-      const token = await this.tokenRepository.findOne({ where: { value: reqRefreshToken, ipAddress: ipAddress } });
+      // const token = await this.tokenRepository.findOne({ where: { value: reqRefreshToken, ipAddress: ipAddress } });
+      const token = await this.tokenRepository.findOne({ where: { value: reqRefreshToken } });
+      console.log("getAccessTokenFromRefreshToken token", token);
       const currentDate = new Date();
       if (!token) {
         throw new NotFoundException("Refresh token not found");
@@ -40,7 +42,7 @@ export class TokenService {
         await this.deleteRefreshToken(token.userId, token.value)
         throw new UnauthorizedException('Refresh token expired');
       }
-      const oldPayload = await this.validateToken(oldAccessToken, true);
+      const oldPayload = await this.validateToken(oldAccessToken, true);console.log("oldPayload--", oldPayload);
       const userData = await this.usersService.findOneByIdForPayload(oldPayload.sub);
       const payload = {
         pseudo: userData.pseudo,
@@ -51,6 +53,7 @@ export class TokenService {
       await this.tokenRepository.delete(token.id);
       const refreshToken = await this.createRefreshToken({ userId: oldPayload.sub, ipAddress });
       return {
+        id: oldPayload.sub,
         accessToken: newAccessToken.accessToken,
         expiresIn: newAccessToken.expiresIn,
         refreshToken: refreshToken

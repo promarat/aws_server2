@@ -26,7 +26,7 @@ export class UsersEntity {
   @Column({ default: null })
   pseudo: string;
 
-  @Column({ select: false })
+  @Column({ nullable: true })
   password: string;
 
   @Column({ unique: true })
@@ -68,6 +68,9 @@ export class UsersEntity {
 
   @Column({nullable: true})
   country: string;
+
+  @Column({ default: false })
+  isRegisteredWithGoogle: boolean;
 
   @CreateDateColumn({
     type: "timestamp without time zone",

@@ -11,6 +11,12 @@ export class RecordDto {
   @ApiModelProperty({ type: 'string', example: 45})
   duration: string;
 
+  @ApiModelProperty({ type: 'string'})
+  category: string;
+
+  @ApiModelProperty({ example: false })
+  privacy: boolean;
+
   @ApiModelProperty({ type: 'string', format: 'binary', required: true })
   file: any;
 }

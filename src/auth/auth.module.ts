@@ -45,7 +45,8 @@ import { SubScribeEntity } from "../entities/subscribe.entity";
     TokenService,
     SubScribeService,
   ],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [AuthService]
 })
 export class AuthModule implements NestModule {
   public configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
@@ -99,7 +100,7 @@ export class AuthModule implements NestModule {
         UsersController,
         ActionsController,
         FilesController,
-        RecordsController
+        RecordsController,
       );
     consumer
       .apply(LocalMiddleware)

@@ -9,17 +9,19 @@
     "access_token_ttl": 9000,
     "refresh_token_ttl": 9000,
     "token_secret": "TOKEN-SECRET-KEY",
-    "smtp_mail": "testemailsssender@gmail.com",
+    "smtp_mail": "daniyarsarsenov19121995@gmail.com",
     "smtp_host": "smtp.gmail.com",
     "smtp_port": 465,
     "smtp_tls": true,
     "smtp_secure": true,
-    "smtp_user": "testemailsssender@gmail.com",
-    "smtp_pass": "aabzfwtsstwuygfa",
+    "smtp_user": "daniyarsarsenov19121995@gmail.com",
+    "smtp_pass": "Wjdrhkdgur!9841226",
     "aws_region": "us-east-2",
     "aws_access_key_id": "AKIAQV2TNIT2PMNGDBDZ",
     "aws_secret_access_key": "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",
-    "aws_public_bucket_name": "social-voice-app-bucket"
+    "aws_public_bucket_name": "social-voice-app-bucket",
+    "google_auth_client_id":  "971245597385-m0an1nlhvq1456pcd6tkj136kpefppvn.apps.googleusercontent.com",
+    "google_auth_client_secret": "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"
   },
   
   "database": {

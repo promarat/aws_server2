@@ -11,6 +11,7 @@ import { RecordsModule } from './records/records.module';
 import { FriendsModule } from './friends/friends.module';
 import { ActionsModule } from './actions/actions.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { GoogleAuthenticationModule } from './googleAuthentication/googleAuthentication.module';
 @Module({
   imports: [
     ConfigModule.load(path.resolve(__dirname, 'config', '**/!(*.d).{ts,js}')),
@@ -49,6 +50,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     FriendsModule,
     ActionsModule,
     NotificationsModule,
+    GoogleAuthenticationModule
   ],
   controllers: [],
   providers: [],

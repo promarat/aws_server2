@@ -16,6 +16,7 @@ import { PublicFileEntity } from "../entities/public-file.entity";
       ])
   ],
   providers: [UsersService],
-  controllers: [UsersController]
+  controllers: [UsersController],
+  exports: [UsersService]
 })
 export class UsersModule {}

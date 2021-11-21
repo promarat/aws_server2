@@ -35,10 +35,30 @@ export class AuthService {
     newUser.pseudo = (Math.floor(Math.random() * 100000) + 100000) + "";
     const createUser = await this.usersService.createUser(newUser)
 
-    // this.mailService.sentVerificationCode(newUser.pseudo, newUser.email);
+    this.mailService.sentVerificationCode(newUser.pseudo, newUser.email);
     return this.login(credentials, ip, createUser)
   }
   
+  async registerWithGoogle(email: string, name: string) {
+    const existUser = await this.usersService.findOneByEmail(email);
+    if (existUser) {
+      throw new BadRequestException("User with current email already registered");
+    }
+
+    const newUser = new UsersEntity();
+    // newUser.password = await GeneratorUtil.generateHash(credentials.password);
+    newUser.email = email;
+    newUser.createdAt = new Date();
+    newUser.isActive = true;
+    newUser.isEmailVerified = true;
+    newUser.updatedAt = new Date();
+    newUser.isRegisteredWithGoogle = true;
+    newUser.pseudo = (Math.floor(Math.random() * 100000) + 100000) + "";
+    const createUser = await this.usersService.createUser(newUser)
+
+    return createUser;
+  }
+
   async login(credentials, ipAddress: string, user): Promise<LoginResponse> {
     const payload: any = {
       username: user.username,

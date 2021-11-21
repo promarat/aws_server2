@@ -50,7 +50,7 @@ export class RecordsService {
       .getCount();
   }
 
-  async getRecordsByUser(userId, page, limit, order, user = null) {
+  async getRecordsByUser(userId, page, limit, order, user = null, category = "", search = "") {
     const paginate = paginationHelper(page, limit);
     const queryBuilder = this.recordsRepository.createQueryBuilder("records")
       .leftJoin("records.user", "user")
@@ -76,6 +76,12 @@ export class RecordsService {
     if (user) {
       await queryBuilder.where({ user: user.id });
     }
+
+    if (category != "")
+      await queryBuilder.where({ category: category });
+    
+    if (search != "")
+      await queryBuilder.where("records.title LIKE ");
 
     const records = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
@@ -214,6 +220,9 @@ export class RecordsService {
     entity.file = uploadFile;
     entity.user = findUser;
     entity.colorType = rand;
+    entity.privacy = body.privacy;
+    entity.category = body.category;
+
     return this.recordsRepository.save(entity);
   }
 

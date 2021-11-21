@@ -84,16 +84,21 @@ export class RecordsController {
   @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
   @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
+  @ApiQuery({ name: 'category', type: String})
+  @ApiQuery({ name: 'search', type: String})
   @Get("world")
   allRecords(
     @Req() req,
     @Res() res,
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @Query('order') order: Order
+    @Query('order') order: Order,
+    @Query('category') category: string,
+    @Query('search') search: string,
   ) {
+    console.log("world-- ", page, limit, order, category, search);
     const { id } = req.user;
-    return this.recordsService.getRecordsByUser(id, page, limit, order)
+    return this.recordsService.getRecordsByUser(id, page, limit, order, null, category, search)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
