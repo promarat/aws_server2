@@ -3,6 +3,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailService } from './mail.service';
 import { ConfigService } from 'nestjs-config';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { ConfigService } from 'nestjs-config';
               pool: true,
               host: configService.get('app.smtp_host'),
               // port: configService.get('app.smtp_port'),
-              ignoreTLS: configService.get('app.smtp_tls'),
+              // ignoreTLS: configService.get('app.smtp_tls'),
               secure: configService.get('app.smtp_secure'),
               auth: {
                 user: configService.get('app.smtp_user'),
@@ -25,7 +26,7 @@ import { ConfigService } from 'nestjs-config';
               },
             },
         template: {
-          dir: __dirname + '/template',
+          dir: join(__dirname, '/template'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,

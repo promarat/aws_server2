@@ -13,7 +13,7 @@
     "smtp_host": "smtp.gmail.com",
     "smtp_port": 465,
     "smtp_tls": true,
-    "smtp_secure": true,
+    "smtp_secure": false,
     "smtp_user": "daniyarsarsenov19121995@gmail.com",
     "smtp_pass": "Wjdrhkdgur!9841226",
     "aws_region": "us-east-2",

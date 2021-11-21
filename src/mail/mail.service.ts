@@ -17,7 +17,7 @@ export class MailService {
             .sendMail({
                 to: email,
                 from: this.configService.get('app.smtp_mail'),
-                subject: 'HI',
+                subject: 'Welcome to Raise Your Voice! Confirm your Email',
                 template: './index', // './' bugfix, undocumented in docs
                 context: {code},
             })
