@@ -43,7 +43,7 @@ export class TokenService {
         throw new UnauthorizedException('Refresh token expired');
       }
       const oldPayload = await this.validateToken(oldAccessToken, true);console.log("oldPayload--", oldPayload);
-      const userData = await this.usersService.findOneByIdForPayload(oldPayload.sub);
+      const userData = await this.usersService.findOneByIdForPayload(token.userId);
       const payload = {
         pseudo: userData.pseudo,
         sub: userData.id,
