@@ -81,7 +81,7 @@ export class RecordsService {
       await queryBuilder.where({ category: category });
     
     if (search != "")
-      await queryBuilder.where("records.title LIKE ");
+      await queryBuilder.where("records.title LIKE '${search}%'", {search:'${search}%'});
 
     const records = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
