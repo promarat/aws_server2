@@ -1,4 +1,5 @@
 import { ApiModelProperty } from "@nestjs/swagger/dist/decorators/api-model-property.decorator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class RecordDto {
 
@@ -19,4 +20,7 @@ export class RecordDto {
 
   @ApiModelProperty({ type: 'string', format: 'binary', required: true })
   file: any;
+
+  @ApiProperty({ example: "9daaf749-6202-4b6f-86fc-133ce7ed8c23" })
+  id: string;
 }

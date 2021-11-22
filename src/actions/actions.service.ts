@@ -31,6 +31,7 @@ export class ActionsService {
     if (!findRecord) {
       throw new NotFoundException("record not found");
     }
+
     const uploadFile = await this.filesService.uploadFile(buffer, filename, FileTypeEnum.AUDIO);
     const entity = new AnswersEntity();
     entity.record = findRecord;
@@ -41,8 +42,8 @@ export class ActionsService {
     return this.answersRepository.save(entity);
   }
 
-  async likeRecord(userId: string, recordId: string, body) {
-    const record = await this.recordsRepository.findOne({ where: { id: recordId } });
+  async likeRecord(userId: string, answerId: string, body) {
+    const record = await this.recordsRepository.findOne({ where: { id: answerId } });
     if (!record) {
       throw new NotFoundException();
     }
@@ -50,18 +51,19 @@ export class ActionsService {
     const existingLike = await this.likesRepository.findOne({
         where: {
           user: userId,
-          record: recordId
+          record: answerId
         }
       }
     );
     if (existingLike) {
-      return this.recordsRepository.update(record.id, { likesCount: record.likesCount + body.count });
+      // return this.recordsRepository.update(record.id, { likesCount: record.likesCount + body.count });
+      return existingLike;
     }
     const like = new LikesEntity();
     like.user = await this.usersRepository.findOne({ where: { id: userId } });
     like.record = record;
     like.type = LikeTypeEnum.RECORD;
-    await this.recordsRepository.update(record.id, { likesCount: record.likesCount + body.count });
+    await this.recordsRepository.update(record.id, { likesCount: record.likesCount + 1/*body.count*/ });
     await this.likesRepository
       .createQueryBuilder()
       .insert()
@@ -85,13 +87,14 @@ export class ActionsService {
       }
     );
     if (existingLike) {
-      await this.answersRepository.update(answer.id, { likesCount: answer.likesCount + body.count });
+      return existingLike;
+      // await this.answersRepository.update(answer.id, { likesCount: answer.likesCount + body.count });
     }
     const like = new LikesEntity();
     like.user = await this.usersRepository.findOne({ where: { id: userId } });
     like.answer = answer;
     like.type = LikeTypeEnum.ANSWER;
-    await this.answersRepository.update(answer.id, { likesCount: answer.likesCount + body.count });
+    await this.answersRepository.update(answer.id, { likesCount: answer.likesCount + 1 });
     await this.likesRepository
       .createQueryBuilder()
       .insert()
@@ -173,4 +176,12 @@ export class ActionsService {
     return this.countriesRepository.find();
   }
 
+  async removeRecord(userId, recordId) {
+    const findRecord = await this.recordsRepository.findOne({ where: { id: recordId, user:userId } });
+    if (!findRecord) {
+      throw new NotFoundException();
+    }
+
+    return this.recordsRepository.delete(findRecord.id);
+  }
 }

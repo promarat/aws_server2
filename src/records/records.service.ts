@@ -50,6 +50,27 @@ export class RecordsService {
       .getCount();
   }
 
+  async getRecordstitle(userId, page, limit, order, category = "", search = "") {
+    const paginate = paginationHelper(page, limit);
+    const queryBuilder = this.recordsRepository.createQueryBuilder("records")
+      .addSelect([
+        "records.title",
+      ])
+      .where("1=1")
+      ;
+    
+    if (search != "")
+      await queryBuilder.andWhere("records.title ILIKE :titlesearch", {titlesearch: '' + search + '%'})
+
+    const records = await queryBuilder
+      .orderBy("records.createdAt", order.toUpperCase())
+      .offset(paginate.offset)
+      .limit(paginate.getLimit)
+      .getMany();
+
+    return records;
+  }
+
   async getRecordsByUser(userId, page, limit, order, user = null, category = "", search = "") {
     const paginate = paginationHelper(page, limit);
     const queryBuilder = this.recordsRepository.createQueryBuilder("records")
@@ -71,24 +92,26 @@ export class RecordsService {
         "file.id",
         "file.link",
         "avatar.link"
-      ]);
+      ])
+      .where("1=1")
+      ;
 
     if (user) {
-      await queryBuilder.where({ user: user.id });
+      await queryBuilder.andWhere({ user: user.id });
     }
 
-    if (category != "")
-      await queryBuilder.where({ category: category });
+    if (category != "")    
+      await queryBuilder.andWhere({ category: category })
     
     if (search != "")
-      await queryBuilder.where("records.title LIKE '${search}%'", {search:'${search}%'});
+      await queryBuilder.andWhere("records.title ILIKE :titlesearch", {titlesearch: '' + search + '%'})
 
     const records = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
       .offset(paginate.offset)
       .limit(paginate.getLimit)
       .getMany();
-    const usersIds = records.filter((el) => el.user?.id !== userId).map((el) => el.user.id);
+    const usersIds = records.filter((el) => el.user?.id !== userId).map((el) => el.user.id); console.log(usersIds);
     const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, userId) : [];
     const recordIds = records.map((el) => el.id);
     const findAnswers = recordIds.length ? await this.getAnswersByRecordIds(recordIds) : [];
@@ -205,11 +228,11 @@ export class RecordsService {
 
   async addRecord(body: RecordDto, user, buffer, filename) {
     const findUser = await this.usersService.getById(user.id);
-    const todayLimit = await this.getTodayRecordCount(user);
+    // const todayLimit = await this.getTodayRecordCount(user);
 
-    if (todayLimit >= this.recordLimit) {
-      throw new BadRequestException("limit for today is exhausted");
-    }
+    // if (todayLimit >= this.recordLimit) {
+    //   throw new BadRequestException("limit for today is exhausted");
+    // }
 
     const uploadFile = await this.filesService.uploadFile(buffer, filename, FileTypeEnum.AUDIO);
     const rand = Math.floor(Math.random() * (3));
@@ -226,4 +249,32 @@ export class RecordsService {
     return this.recordsRepository.save(entity);
   }
 
+  async updateRecord(body: RecordDto, user, buffer, filename) {
+    const findRecord = await this.recordsRepository.findOne({ where: { id: body.id, user:user.id } });
+    if (!findRecord) {
+      throw new NotFoundException();
+    }
+
+    const findUser = await this.usersService.getById(user.id);
+    // const todayLimit = await this.getTodayRecordCount(user);
+
+    // if (todayLimit >= this.recordLimit) {
+    //   throw new BadRequestException("limit for today is exhausted");
+    // }
+
+    console.log(findRecord);
+
+    const uploadFile = await this.filesService.uploadFile(buffer, filename, FileTypeEnum.AUDIO);
+    const rand = Math.floor(Math.random() * (3));
+    findRecord.title = body.title;
+    findRecord.emoji = body.emoji;
+    findRecord.duration = body.duration;
+    findRecord.file = uploadFile;
+    findRecord.user = findUser;
+    findRecord.colorType = rand;
+    findRecord.privacy = body.privacy;
+    findRecord.category = body.category;
+
+    return this.recordsRepository.save(findRecord);
+  }
 }

@@ -42,17 +42,17 @@ export class ActionsController {
   async answer(
     @Req() req,
     @Res() res,
-    @Query("record") record: string,
+    // @Query("record") record: string,
     @UploadedFile() file,
     @Body() body: FileDto
   ) {
     const user = req.user;
-    return this.actionsService.answerToRecord(user, record, body.duration, file.buffer, file.originalname)
+    return this.actionsService.answerToRecord(user, body.record, body.duration, file.buffer, file.originalname)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
-  @Post("answer/:id/like")
+  @Post("answerappreciate")
   @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "answer not found" })
   @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "like exist" })
   @ApiParam({ name: "id", type: String, required: true })
@@ -60,15 +60,15 @@ export class ActionsController {
     @Req() req,
     @Res() res,
     @Body() body: LikesRequestDto,
-    @Param("id") answerId: string,
+    // @Param("id") answerId: string,
   ) {
     const user = req.user;
-    return this.actionsService.likeAnswer(user.id, answerId, body)
+    return this.actionsService.likeAnswer(user.id, body.id, body)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
-  @Post("record/:id/like")
+  @Post("recordappreciate")
   @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "record not found" })
   @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "like exist" })
   @ApiParam({ name: "id", type: String, required: true })
@@ -76,10 +76,10 @@ export class ActionsController {
     @Req() req,
     @Res() res,
     @Body() body: LikesRequestDto,
-    @Param("id") recordId: string
+    // @Param("id") recordId: string
   ) {
     const user = req.user;
-    return this.actionsService.likeRecord(user.id, recordId, body)
+    return this.actionsService.likeRecord(user.id, body.id, body)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -148,5 +148,19 @@ export class ActionsController {
     return this.actionsService.getAllCountries()
       .then((data) => res.json(data))
       .catch(err => !err.status ? console.log(err) : res.status(err.status).send(err.message));
+  }
+
+  @Delete("record")
+  @ApiParam({ name: "id", required: true, type: Number })
+  async deleteRecord(
+    @Req() req,
+    @Res() res,
+    @Query("id") id: string
+  ) {
+    console.log("delete record--", id);
+    const user = req.user;
+    return this.actionsService.removeRecord(user.id, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 }
