@@ -1,8 +1,8 @@
 {
   "app": {
-    "host": "https://mirrerservertest.herokuapp.com",
-    "port": 80,
-    "domain": "https://mirrerservertest.herokuapp.com",
+    "host": "ec2-18-191-232-197.us-east-2.compute.amazonaws.com",
+    "port": 5432,
+    "domain": "https://ec2-18-191-232-197.us-east-2.compute.amazonaws.com",
     "domain_description": "part of links files in database",
     "backend_api_prefix": "",
     "backend_api_prefix_description": "sets global prefix for all endpoints, example: ip:port/prefix/endpointName,  leave empty for ip:port/endpointName",
