@@ -8,7 +8,11 @@ import * as bodyParser from 'body-parser';
 import { config } from 'aws-sdk';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
+  var https = require('https');
+  var fs = require('fs');
+  var httpsoptions = { key : fs.readFileSync('./privatekey.pem'), cert: fs.readFileSync('./server.crt'), cors:true };
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, httpsoptions);
+  // const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
   const configService = app.get<any>(ConfigService);
   const host = configService.get('app.host')
   const port = configService.get('app.port')
