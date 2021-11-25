@@ -9,7 +9,8 @@ import {
   Req,
   Res,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
+  Query
 } from "@nestjs/common";
 import { AccountService } from "./account.service";
 import {
@@ -17,7 +18,7 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiOperation,
-  ApiTags, ApiUnauthorizedResponse
+  ApiTags, ApiUnauthorizedResponse, ApiParam
 } from "@nestjs/swagger";
 import { CompleteRegisterDto } from "./dto/complete-register.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -96,12 +97,25 @@ export class AccountController {
     @UploadedFile() file,
     @Body() body: AvatarDto
   ) {
-    console.log("avatar file--", file);
-    console.log("avatar body--", body);
     const user = req.user;
     return this.accountService.addAvatar(user.id, file.buffer, file.originalname)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Post("resetpassword")
+  @ApiCreatedResponse({ status: HttpStatus.OK, type: FileResponse, description: "password changed correctly" })
+  @ApiParam({ name: "oldpassword", required: true, type: String })
+  @ApiParam({ name: "newpassword", required: true, type: String })
+  async resetPassword(
+    @Req() req,
+    @Res() res,
+    @Query("oldpassword") oldpassword: string,
+    @Query("newpassword") newpassword: string,
+  ) {
+    const user = req.user;
+    return this.accountService.resetpassword(user, oldpassword, newpassword)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
 }

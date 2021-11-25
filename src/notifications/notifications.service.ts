@@ -3,6 +3,13 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { NotificationsEntity } from "../entities/notification.entity";
 import { Repository } from "typeorm";
 import { paginationHelper } from "../lib/helpers";
+import { NotificationTypeEnum } from "../lib/enum";
+import { UsersEntity } from "src/entities/users.entity";
+import { RecordsEntity } from "src/entities/records.entity";
+import { AnswersEntity } from "src/entities/answers.entity";
+import { FriendsEntity } from "src/entities/friends.entity";
+import { UnreadNotificationResponse } from "./dto/notificationresponse.dto";
+import { type } from "os";
 
 @Injectable()
 export class NotificationsService {
@@ -13,19 +20,24 @@ export class NotificationsService {
     const paginate = paginationHelper(page, limit);
     return this.notificationRepository
       .createQueryBuilder('notifications')
-      .where({ toUser: user.id })
+      .where({ toUser: user.id})
+      .andWhere("notifications.type <> :notitype", {notitype: NotificationTypeEnum.FRIEND_REQUEST})
       .leftJoin('notifications.fromUser', 'fromUser')
-      .leftJoin('notifications.records', 'records')
-      .leftJoin('notifications.answers', 'answers')
+      .leftJoin("fromUser.avatar", "avatar")
+      .leftJoin('notifications.record', 'records')
+      .leftJoin('notifications.answer', 'answers')
       .select([
         'notifications.id',
         'notifications.type',
         'notifications.seen',
         'notifications.createdAt',
         'records.id',
+        'records.emoji',
         'answers.id',
+        'answers.emoji',
         'fromUser.id',
-        'fromUser.pseudo'
+        'avatar.url'
+        // 'fromUser.pseudo'
       ])
       .limit(paginate.getLimit)
       .offset(paginate.offset)
@@ -42,5 +54,52 @@ export class NotificationsService {
       throw new BadRequestException('already seen')
     }
     return this.notificationRepository.update(findNotification.id, { seen: true })
+  }
+
+  async sendNotification(sender: UsersEntity, reciever: UsersEntity, record: RecordsEntity, answer: AnswersEntity, friend: FriendsEntity,  type: NotificationTypeEnum) {
+    const notification = new NotificationsEntity();
+    notification.type = type;
+    notification.seen = false;
+    notification.fromUser = sender;
+    notification.toUser = reciever;
+    notification.record = record;
+    notification.answer = answer;
+    notification.friend = friend;
+    return this.notificationRepository.save(notification);
+  }
+
+  async getUnreadArticleCount(user) {
+    console.log(user);
+    const { count } = await this.notificationRepository
+    .createQueryBuilder('notifications')
+    .where({ toUser: user.id, seen: false})
+    .andWhere("notifications.type <> :notitype", {notitype: NotificationTypeEnum.FRIEND_REQUEST})
+    .select([
+      'COUNT(notifications.id)'
+    ]).getRawOne();
+
+    const UnReadCount: any = {
+      count: count
+    };
+
+    console.log("UnReadCount--", count, UnReadCount);
+    return UnReadCount;
+  }
+
+  async getUnreadRequestCount(user) {
+    console.log(user);
+    const { count } = await this.notificationRepository
+    .createQueryBuilder('notifications')
+    .where({ toUser: user.id, seen: false, type: NotificationTypeEnum.FRIEND_REQUEST})
+    .select([
+      'COUNT(notifications.id)'
+    ]).getRawOne();
+
+    const UnReadCount: any = {
+      count: count
+    };
+
+    console.log("UnReadCount--", count, UnReadCount);
+    return UnReadCount;
   }
 }

@@ -89,9 +89,10 @@ export class RecordsService {
         "user.id",
         "user.pseudo",
         "user.avatar",
+        "user.name",
         "file.id",
-        "file.link",
-        "avatar.link"
+        "file.url",
+        "avatar.url"
       ])
       .where("1=1")
       ;
@@ -111,24 +112,26 @@ export class RecordsService {
       .offset(paginate.offset)
       .limit(paginate.getLimit)
       .getMany();
-    const usersIds = records.filter((el) => el.user?.id !== userId).map((el) => el.user.id); console.log(usersIds);
-    const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, userId) : [];
+    // const usersIds = records.filter((el) => el.user?.id !== userId).map((el) => el.user.id); console.log(usersIds);
+    // const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, userId) : [];
     const recordIds = records.map((el) => el.id);
-    const findAnswers = recordIds.length ? await this.getAnswersByRecordIds(recordIds) : [];
-    const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds) : [];
-
+    // const findAnswers = recordIds.length ? await this.getAnswersByRecordIds(recordIds) : [];
+    // const likes = recordIds.length ? await this.getRecordLikesById(recordIds) : [];
+    const likes = await this.getRecordLikesByIds(recordIds);
     return records.map((el) => {
-      const findRecordLikes = filter(likes, (obj) => obj.record.id === el.id);
-      const findUserLike = find(findRecordLikes, (obj) => obj.user.id === el.user.id);
-      const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
-      const filterAnswers = filter(findAnswers, (obj) => obj.record.id === el.id);
-      const findAnswer = find(filterAnswers, (obj) => obj.user.id === el.user.id);
+      // const findRecordLikes = filter(likes, (obj) => obj.record.id === el.id);console.log("i--like---", findRecordLikes);
+      // const findUserLike = find(findRecordLikes, (obj) => obj.user.id === el.user.id);
+      // const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
+      // const filterAnswers = filter(findAnswers, (obj) => obj.record.id === el.id);
+      // const findAnswer = find(filterAnswers, (obj) => obj.user.id === el.user.id);
+      const findlikes = filter(likes, (obj) => obj.record.id === el.id);
+      console.log("like-------", findlikes);
       return {
         ...el,
-        isLiked: !!findUserLike,
+        likes: findlikes && findlikes.length > 3? findlikes.slice(0, 3) : (findlikes ?  findlikes : []),
         isMine: userId === el.user.id,
-        friend: findFriend ? findFriend.status : userId === el.user.id ? null : "not invited",
-        isAnswered: !!findAnswer
+        // friend: findFriend ? findFriend.status : userId === el.user.id ? null : "not invited",
+        // isAnswered: !!findAnswer
       };
     });
   }
@@ -158,13 +161,26 @@ export class RecordsService {
       .getMany();
   }
 
+  getRecordLikesById(ids): Promise<LikesEntity[]> {
+    return this.likesRepository
+      .createQueryBuilder("likes")
+      .innerJoin("likes.record", "record", "record.id in (:...ids)", { ids })
+      .select([
+        "likes.emoji",
+      ])
+      // .orderBy("likes.createdAt", "DESC")
+      // .offset(0)
+      // .limit(3)
+      .getMany();
+  }
+
   getRecordLikesByIds(ids): Promise<LikesEntity[]> {
     return this.likesRepository
       .createQueryBuilder("likes")
       .innerJoin("likes.record", "record", "record.id in (:...ids)", { ids })
       .leftJoin("likes.user", "user")
       .select([
-        "likes.id",
+        "likes.emoji",
         "user.id",
         "record.id"
       ])

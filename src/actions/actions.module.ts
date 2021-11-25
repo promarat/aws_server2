@@ -11,6 +11,9 @@ import { UsersEntity } from "../entities/users.entity";
 import { FriendsEntity } from "../entities/friends.entity";
 import { CountryEntity } from "../entities/countries.entity";
 import { RecordsService } from "../records/records.service";
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationsEntity } from '../entities/notification.entity';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -22,8 +25,9 @@ import { RecordsService } from "../records/records.service";
         PublicFileEntity,
         UsersEntity,
         FriendsEntity,
-        CountryEntity
-      ])
+        CountryEntity,
+      ]),
+      NotificationsModule
   ],
   providers: [ActionsService, FileService],
   controllers: [ActionsController]

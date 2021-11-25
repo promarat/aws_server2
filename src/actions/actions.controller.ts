@@ -115,20 +115,33 @@ export class ActionsController {
   // }
 
 
-  @Post("fiend")
-  @ApiParam({ name: "id", required: true, type: Number })
+  @Post("follow")
+  @ApiParam({ name: "userid", required: true, type: String })
+  async requestFollow(
+    @Req() req,
+    @Res() res,
+    @Query("userid") id: string
+  ) {
+    const user = req.user;
+    return this.actionsService.followFriend(user, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("acceptfriend")
+  @ApiParam({ name: "id", required: true, type: String })
   async addFriend(
     @Req() req,
     @Res() res,
     @Query("id") id: string
   ) {
     const user = req.user;
-    return this.actionsService.addFriend(user.id, id)
+    return this.actionsService.acceptFriend(user, id)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
-  @Delete("fiend")
+  @Delete("unfollow")
   @ApiParam({ name: "id", required: true, type: Number })
   async deleteFriend(
     @Req() req,
@@ -136,7 +149,7 @@ export class ActionsController {
     @Query("id") id: string
   ) {
     const user = req.user;
-    return this.actionsService.removeFriend(user.id, id)
+    return this.actionsService.removeFriend(user, id)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

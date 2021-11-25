@@ -18,9 +18,10 @@ export enum FriendsStatusEnum {
 export enum NotificationTypeEnum {
   LIKE_RECORD = 'likeRecord',
   LIKE_ANSWER = 'likeAnswer',
+  NEW_ANSWER = 'newAnswer',
   FRIEND_REQUEST = 'friendRequest',
   FRIEND_ACCEPT = 'friendAccept',
-  NEW_ANSWER = 'newAnswer'
+  FRIEND_DELETE = 'friendDelete',
 }
 
 export enum FileTypeEnum {

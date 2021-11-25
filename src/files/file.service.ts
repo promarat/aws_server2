@@ -21,7 +21,8 @@ export class FileService {
     const uploadResult = await s3.upload({
       Bucket: this.configService.get("app.aws_public_bucket_name"),
       Body: dataBuffer,
-      Key: `${uuid()}-${filename}`
+      Key: `${uuid()}-${filename}`,
+      ACL:'public-read'
     })
       .promise();
     const generateId = uuid();

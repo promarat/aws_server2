@@ -40,4 +40,7 @@ export class LikesEntity {
     name: "createdAt"
   })
   createdAt: Date;
+
+  @Column({ nullable: true })
+  emoji: string;
 }

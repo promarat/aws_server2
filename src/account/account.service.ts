@@ -8,6 +8,8 @@ import { GenderEnum } from "../lib/enum";
 import { EmailVerify } from "./dto/emailverify.dto";
 import { find } from "rxjs";
 import { UsersEntity } from "src/entities/users.entity";
+import { GeneratorUtil } from "../lib/generator-util";
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AccountService {
@@ -57,4 +59,15 @@ export class AccountService {
       throw new BadRequestException("Email Verify Faild");
   }
 
+  async resetpassword(user, oldpassword, newpassword) {
+    const findUser = await this.usersService.findById(user.id);
+    console.log("reset password--", oldpassword, newpassword, findUser, await GeneratorUtil.generateHash(oldpassword));
+    const valid = await bcrypt.compare(oldpassword, findUser.password);
+    if (!valid) {
+      throw new BadRequestException("incorrect old password");
+    }
+
+    findUser.password = await GeneratorUtil.generateHash(newpassword);
+    return this.usersService.completeRegister(findUser);
+  }
 }

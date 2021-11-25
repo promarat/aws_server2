@@ -22,6 +22,7 @@ import { FilesController } from "../files/files.controller";
 import { RecordsController } from "../records/records.controller";
 import { SubScribeService } from "./subscripbe/subscribe.service";
 import { SubScribeEntity } from "../entities/subscribe.entity";
+import { NotificationsController } from "src/notifications/notifications.controller";
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ export class AuthModule implements NestModule {
         ActionsController,
         FilesController,
         RecordsController,
+        NotificationsController
       );
     consumer
       .apply(LocalMiddleware)
