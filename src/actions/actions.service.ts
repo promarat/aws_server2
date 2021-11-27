@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AnswersEntity } from "../entities/answers.entity";
-import { Repository } from "typeorm";
+import { Repository, getConnection } from "typeorm";
 import { LikesEntity, LikeTypeEnum } from "../entities/llikes.entity";
 import { RecordsEntity } from "../entities/records.entity";
 import { FileService } from "../files/file.service";
@@ -27,11 +27,18 @@ export class ActionsService {
 
   async answerToRecord(user, record, duration, buffer, filename) {
     const findRecord = await this.recordsRepository.createQueryBuilder("record")
+      .leftJoin('record.user', 'user')
       .where({ id: record })
-      .select(["record.id"])
+      .select(["record.id", "user.id"])
       .getOne();
+
     if (!findRecord) {
       throw new NotFoundException("record not found");
+    }
+
+    if (findRecord.user.id != user.id) {
+      const touser = await this.usersRepository.findOne({ where: { id: findRecord.user.id } });
+      this.notificationService.sendNotification(user, touser, findRecord, null, null, NotificationTypeEnum.NEW_ANSWER);
     }
 
     const uploadFile = await this.filesService.uploadFile(buffer, filename, FileTypeEnum.AUDIO);
@@ -44,31 +51,38 @@ export class ActionsService {
     return this.answersRepository.save(entity);
   }
 
-  async likeRecord(userId: string, recordId: string, body) {
-    const record = await this.recordsRepository.findOne({ where: { id: recordId } });
+  async likeRecord(user, recordId: string, body) {
+    const record = await this.recordsRepository.createQueryBuilder("record")
+      .leftJoin('record.user', 'user')
+      .where({ id: recordId })
+      .select(["record.id", "record.likesCount", "user.id"])
+      .getOne();
     if (!record) {
       throw new NotFoundException();
     }
 
     const existingLike = await this.likesRepository.findOne({
         where: {
-          user: userId,
+          user: user.id,
           record: recordId
         }
       }
     );
     if (existingLike) {
-      // return this.recordsRepository.update(record.id, { likesCount: record.likesCount + body.count });
-      return existingLike;
+      throw new BadRequestException("already appreciate");
     }
+
+    if (record.user.id != user.id) {
+      const touser = await this.usersRepository.findOne({ where: { id: record.user.id } });
+      this.notificationService.sendNotification(user, touser, record, null, null, NotificationTypeEnum.LIKE_RECORD);
+    }
+
     const like = new LikesEntity();
-    like.user = await this.usersRepository.findOne({ where: { id: userId } });
+    like.user = await this.usersRepository.findOne({ where: { id: user.id } });
     like.record = record;
     like.type = LikeTypeEnum.RECORD;
     like.emoji = body.emoji;
-    // await this.recordsRepository.update(record.id, { likesCount: record.likesCount + 1/*body.count*/ });
-    record.likesCount = record.likesCount + 1;
-    this.recordsRepository.save(record);
+    getConnection().createQueryBuilder().update("records").set({ likesCount : record.likesCount + 1 }).where({ id: record.id}).execute();
 
     await this.likesRepository
       .createQueryBuilder()
@@ -79,30 +93,38 @@ export class ActionsService {
     return like;
   }
 
-  async likeAnswer(userId: string, answerId: string, body) {
-    const answer = await this.answersRepository.findOne({ where: { id: answerId } });
+  async likeAnswer(user, answerId: string, body) {
+    const answer = await this.answersRepository.createQueryBuilder("answer")
+    .leftJoin('answer.user', 'user')
+    .where({ id: answerId })
+    .select(["answer.id", "answer.likesCount", "user.id"])
+    .getOne();
     if (!answer) {
       throw new NotFoundException("answer not found");
     }
 
     const existingLike = await this.likesRepository.findOne({
         where: {
-          user: userId,
+          user: user.id,
           answer: answerId
         }
       }
     );
     if (existingLike) {
-      return existingLike;
-      // await this.answersRepository.update(answer.id, { likesCount: answer.likesCount + body.count });
+      throw new BadRequestException("already appreciate");
     }
+
+    if (answer.user.id != user.id) {
+      const touser = await this.usersRepository.findOne({ where: { id: answer.user.id } });
+      this.notificationService.sendNotification(user, touser, null, answer, null, NotificationTypeEnum.LIKE_ANSWER);
+    }
+
     const like = new LikesEntity();
-    like.user = await this.usersRepository.findOne({ where: { id: userId } });
+    like.user = await this.usersRepository.findOne({ where: { id: user.id } });
     like.answer = answer;
     like.type = LikeTypeEnum.ANSWER;
-    // await this.answersRepository.update(answer.id, { likesCount: answer.likesCount + 1 });
-    answer.likesCount = answer.likesCount + 1;
-    this.answersRepository.save(answer);
+    
+    getConnection().createQueryBuilder().update("answers").set({ likesCount : answer.likesCount + 1 }).where({ id: answer.id}).execute();
 
     await this.likesRepository
       .createQueryBuilder()

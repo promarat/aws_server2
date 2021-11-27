@@ -17,6 +17,9 @@ export class LikesEntity {
   @Column({ type: "enum", enum: LikeTypeEnum })
   type: LikeTypeEnum;
 
+  @Column({default: null})
+  emoji: string;
+
   @ManyToOne(() => UsersEntity, (user) => user.likes, {
     nullable: false,
     onDelete: "CASCADE"
@@ -39,8 +42,5 @@ export class LikesEntity {
     type: "timestamp without time zone",
     name: "createdAt"
   })
-  createdAt: Date;
-
-  @Column({ nullable: true })
-  emoji: string;
+  createdAt: Date; 
 }

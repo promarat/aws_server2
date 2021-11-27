@@ -118,4 +118,34 @@ export class AccountController {
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
+
+  @Post("changeemail")
+  @ApiCreatedResponse({ status: HttpStatus.OK, description: "password changed correctly" })
+  @ApiParam({ name: "password", required: true, type: String })
+  @ApiParam({ name: "newemail", required: true, type: String })
+  async changeEmail(
+    @Req() req,
+    @Res() res,
+    @Query("password") password: string,
+    @Query("newemail") newemail: string,
+  ) {
+    const user = req.user;
+    return this.accountService.changeEmail(user, password, newemail)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("changeemailverify")
+  @ApiCreatedResponse({ status: HttpStatus.OK, description: "password changed correctly" })
+  @ApiParam({ name: "pseudo", required: true, type: String })
+  async changeEmailVerify(
+    @Req() req,
+    @Res() res,
+    @Query("pseudo") pseudo: string,
+  ) {
+    const user = req.user;
+    return this.accountService.changeEmailVerify(user, pseudo)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
 }

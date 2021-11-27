@@ -65,12 +65,18 @@ export class UsersEntity {
     enum: GenderEnum,
   })
   gender: GenderEnum;
-
+  
   @Column({nullable: true})
   country: string;
-
+  
   @Column({ default: false })
   isRegisteredWithGoogle: boolean;
+  
+  @Column({ default: null })
+  newemail: string;
+
+  @Column({ default: null })
+  newpseudo: string;
 
   @CreateDateColumn({
     type: "timestamp without time zone",

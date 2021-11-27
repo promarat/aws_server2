@@ -19,4 +19,10 @@ export class CompleteRegisterDto {
 
   @ApiProperty()
   gender: string;
+
+  @ApiProperty()
+  first: string;
+
+  @ApiProperty()
+  last: string;
 }

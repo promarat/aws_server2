@@ -1,4 +1,4 @@
-import { Controller, Get, Post, HttpStatus, Logger, Param, Put, Query, Req, Res } from "@nestjs/common";
+import { Controller, Get, Post, Delete, HttpStatus, Logger, Param, Put, Query, Req, Res } from "@nestjs/common";
 import { NotificationsService } from "./notifications.service";
 import { ApiParam, ApiQuery, ApiResponse, ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Order } from "../lib/enum";
@@ -18,31 +18,61 @@ export class NotificationsController {
   @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
   @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
+  @ApiQuery({ name: 'type', required: true, type: String})
   @Get("getnotifications")
-  userRecords(
+  getNotifications(
     @Req() req,
     @Res() res,
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @Query('order') order: Order
+    @Query('order') order: Order,
+    @Query('type') type: string
   ) {
     const user = req.user; console.log(user);
-    return this.notificationsService.getNotificationsByUser(page, limit, order, user)
+    return this.notificationsService.getNotificationsByUser(page, limit, order, type, user)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
   // @ApiResponse({ status: HttpStatus.OK, type: [RecordAnswersResponse] })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
-  @ApiParam({ name: 'id', required: true, type: String, description: 'id of record'})
-  @Put(":id/seen")
+  @ApiQuery({ name: 'id', required: true, type: String, description: 'id of record'})
+  @Put("seen")
   getAnswersByRecord(
     @Req() req,
     @Res() res,
-    @Param('id') id: string,
+    @Query('id') id: string,
   ) {
     const user = req.user;
-    return this.notificationsService.seenNotification(id, user)
+    return this.notificationsService.seenNotification(user, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'id', required: true, type: String, description: 'id of record'})
+  @Delete("deletenotification")
+  deleteNotification(
+    @Req() req,
+    @Res() res,
+    @Query('id') id: string,
+  ) {
+    const user = req.user;
+    return this.notificationsService.deleteNotification(user, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'type', required: true, type: String, description: 'type of notification'})
+  @Put("allseen")
+  markAllAsRead(
+    @Req() req,
+    @Res() res,
+    @Query('type') type: string,
+  ) {
+    const user = req.user;
+    return this.notificationsService.markAllAsRead(user, type)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

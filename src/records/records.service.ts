@@ -293,4 +293,8 @@ export class RecordsService {
 
     return this.recordsRepository.save(findRecord);
   }
+
+  async getSeveralCounts(user, other = null) {
+    
+  }
 }

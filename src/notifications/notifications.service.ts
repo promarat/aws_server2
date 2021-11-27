@@ -8,6 +8,7 @@ import { UsersEntity } from "src/entities/users.entity";
 import { RecordsEntity } from "src/entities/records.entity";
 import { AnswersEntity } from "src/entities/answers.entity";
 import { FriendsEntity } from "src/entities/friends.entity";
+import { getConnection } from "typeorm";
 import { UnreadNotificationResponse } from "./dto/notificationresponse.dto";
 import { type } from "os";
 
@@ -16,13 +17,20 @@ export class NotificationsService {
   constructor(@InjectRepository(NotificationsEntity) private notificationRepository: Repository<NotificationsEntity>) {
   }
 
-  getNotificationsByUser(page, limit, order, user): Promise<NotificationsEntity[]> {
+  getNotificationsByUser(page, limit, order, type, user): Promise<NotificationsEntity[]> {
     const paginate = paginationHelper(page, limit);
-    return this.notificationRepository
+    const queryBuilder = this.notificationRepository
       .createQueryBuilder('notifications')
       .where({ toUser: user.id})
-      .andWhere("notifications.type <> :notitype", {notitype: NotificationTypeEnum.FRIEND_REQUEST})
-      .leftJoin('notifications.fromUser', 'fromUser')
+
+    if ( type !=  NotificationTypeEnum.FRIEND_REQUEST){
+      queryBuilder.andWhere("notifications.type <> :notitype", {notitype: NotificationTypeEnum.FRIEND_REQUEST});
+    }
+    else{
+      queryBuilder.andWhere({type: NotificationTypeEnum.FRIEND_REQUEST});
+    }
+    
+    return queryBuilder.leftJoin('notifications.fromUser', 'fromUser')
       .leftJoin("fromUser.avatar", "avatar")
       .leftJoin('notifications.record', 'records')
       .leftJoin('notifications.answer', 'answers')
@@ -34,7 +42,6 @@ export class NotificationsService {
         'records.id',
         'records.emoji',
         'answers.id',
-        'answers.emoji',
         'fromUser.id',
         'avatar.url'
         // 'fromUser.pseudo'
@@ -45,7 +52,7 @@ export class NotificationsService {
       .getMany()
   }
 
- async seenNotification(id, user) {
+ async seenNotification(user, id = "") {
     const findNotification = await this.notificationRepository.findOne({where: { toUser: user.id, id }})
     if(!findNotification) {
       throw new NotFoundException()
@@ -53,7 +60,33 @@ export class NotificationsService {
     if(findNotification.seen) {
       throw new BadRequestException('already seen')
     }
-    return this.notificationRepository.update(findNotification.id, { seen: true })
+    findNotification.seen = true;
+    return this.notificationRepository.save(findNotification)
+  }
+
+  async deleteNotification(user, id = "") {
+    const findNotification = await this.notificationRepository.findOne({where: { toUser: user.id, id }})
+    if(!findNotification) {
+      throw new NotFoundException()
+    }
+    if(findNotification.seen) {
+      throw new BadRequestException('already seen')
+    }
+    return this.notificationRepository.remove(findNotification)
+  }
+
+  async markAllAsRead(user, type) {
+    const queryBuilder = getConnection()
+      .createQueryBuilder().update("notification").set({ seen : true }).where({ toUser: user.id})
+    
+    if ( type !=  NotificationTypeEnum.FRIEND_REQUEST){
+      queryBuilder.andWhere("notification.type <> :notitype", {notitype: NotificationTypeEnum.FRIEND_REQUEST});
+    }
+    else{
+      queryBuilder.andWhere({type: NotificationTypeEnum.FRIEND_REQUEST});
+    }
+
+    return queryBuilder.execute();
   }
 
   async sendNotification(sender: UsersEntity, reciever: UsersEntity, record: RecordsEntity, answer: AnswersEntity, friend: FriendsEntity,  type: NotificationTypeEnum) {

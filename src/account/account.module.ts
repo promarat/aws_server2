@@ -11,6 +11,7 @@ import { RecordsEntity } from "../entities/records.entity";
 import { AnswersEntity } from "../entities/answers.entity";
 import { LikesEntity } from "../entities/llikes.entity";
 import { FriendsEntity } from "../entities/friends.entity";
+import { MailService } from "src/mail/mail.service";
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { FriendsEntity } from "../entities/friends.entity";
     AccountService,
     UsersService,
     FileService,
-    RecordsService
+    RecordsService,
+    MailService
   ],
   controllers: [AccountController]
 })

@@ -10,13 +10,15 @@ import { find } from "rxjs";
 import { UsersEntity } from "src/entities/users.entity";
 import { GeneratorUtil } from "../lib/generator-util";
 import * as bcrypt from 'bcryptjs';
+import { MailService } from "src/mail/mail.service";
 
 @Injectable()
 export class AccountService {
   constructor(
     private usersService: UsersService,
     private recordsService: RecordsService,
-    private fileService: FileService
+    private fileService: FileService,
+    private mailService: MailService
   ) {
   }
 
@@ -36,6 +38,9 @@ export class AccountService {
     findUser.gender = <GenderEnum>body.gender;
     findUser.name = body.name;
     findUser.isProfileCompleted = true;
+    findUser.firstname = body.first;
+    findUser.lastname = body.last;
+
     return this.usersService.completeRegister(findUser);
   }
 
@@ -61,7 +66,6 @@ export class AccountService {
 
   async resetpassword(user, oldpassword, newpassword) {
     const findUser = await this.usersService.findById(user.id);
-    console.log("reset password--", oldpassword, newpassword, findUser, await GeneratorUtil.generateHash(oldpassword));
     const valid = await bcrypt.compare(oldpassword, findUser.password);
     if (!valid) {
       throw new BadRequestException("incorrect old password");
@@ -69,5 +73,30 @@ export class AccountService {
 
     findUser.password = await GeneratorUtil.generateHash(newpassword);
     return this.usersService.completeRegister(findUser);
+  }
+
+  async changeEmail(user, password, newemail) {
+    const findUser = await this.usersService.findById(user.id);
+    const valid = await bcrypt.compare(password, findUser.password);
+    if (!valid) {
+      throw new BadRequestException("incorrect password");
+    }
+
+    findUser.newpseudo = (Math.floor(Math.random() * 100000) + 100000) + "";
+    findUser.newemail = newemail;
+    
+    this.mailService.sentVerificationCode(findUser.newpseudo, newemail);
+
+    return this.usersService.completeRegister(findUser);
+  }
+
+  async changeEmailVerify(user, pseudo) {
+    const findUser = await this.usersService.findById(user.id);
+    if (findUser.newpseudo == pseudo){
+      findUser.email = findUser.newemail;
+      return this.usersService.completeRegister(findUser);
+    }
+    else
+      throw new BadRequestException("NewEmail Verify Faild");
   }
 }

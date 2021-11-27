@@ -63,7 +63,7 @@ export class ActionsController {
     // @Param("id") answerId: string,
   ) {
     const user = req.user;
-    return this.actionsService.likeAnswer(user.id, body.id, body)
+    return this.actionsService.likeAnswer(user, body.id, body)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -79,7 +79,7 @@ export class ActionsController {
     // @Param("id") recordId: string
   ) {
     const user = req.user;
-    return this.actionsService.likeRecord(user.id, body.id, body)
+    return this.actionsService.likeRecord(user, body.id, body)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
