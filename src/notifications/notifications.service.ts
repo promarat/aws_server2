@@ -38,6 +38,7 @@ export class NotificationsService {
         'fromUser.id',
         'fromUser.name',
         'friends.id',
+        'friends.status',
         'avatar.url'
         // 'fromUser.pseudo'
       ]);
@@ -77,9 +78,6 @@ export class NotificationsService {
     const findNotification = await this.notificationRepository.findOne({where: { toUser: user.id, id }})
     if(!findNotification) {
       throw new NotFoundException()
-    }
-    if(findNotification.seen) {
-      throw new BadRequestException('already seen')
     }
     return this.notificationRepository.remove(findNotification)
   }

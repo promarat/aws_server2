@@ -40,7 +40,7 @@ export class AccountService {
     findUser.isProfileCompleted = true;
     findUser.firstname = body.first;
     findUser.lastname = body.last;
-    findUser.isPrivate = body.isPriavate == "true" ? true : false;
+    findUser.isPrivate = body.isPrivate == "true" ? true : false;
     console.log(findUser);
     return this.usersService.completeRegister(findUser);
   }
