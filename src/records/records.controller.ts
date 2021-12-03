@@ -14,7 +14,7 @@ import { RecordsService } from "./records.service";
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { RecordDto } from "./dto/record.dto";
-import { RecordAnswersResponse, RecordsResponse } from "./dto/records.response";
+import { RecordAnswersResponse, RecordsResponse, ServeralCountResponse } from "./dto/records.response";
 import { Order } from "../lib/enum";
 
 @Controller("records")
@@ -27,19 +27,23 @@ export class RecordsController {
 
   @ApiResponse({ status: HttpStatus.OK, type: [RecordsResponse] })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
-  @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
-  @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
+  @ApiQuery({ name: 'skip', required: true, type: Number, example: 1})
+  @ApiQuery({ name: 'take', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
+  @ApiQuery({ name: 'userid', type: String})
   @Get("me")
   userRecords(
     @Req() req,
     @Res() res,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-    @Query('order') order: Order
+    @Query('skip') skip: number,
+    @Query('take') take: number,
+    @Query('order') order: Order,
+    @Query('userid') userid: String
   ) {
     const user = req.user;
-    return this.recordsService.getRecordsByUser(user.id, page, limit, order, user) //todo add friend records
+    var user_id = userid == "" ? user.id : userid;
+
+    return this.recordsService.getRecordsByUser(user.id, skip, take, order, user_id) //todo add friend records
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -47,20 +51,20 @@ export class RecordsController {
   @ApiResponse({ status: HttpStatus.OK, type: [RecordAnswersResponse] })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
   @ApiQuery({ name: 'id', required: true, type: String, description: 'id of record'})
-  @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
-  @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
+  @ApiQuery({ name: 'skip', required: true, type: Number, example: 1})
+  @ApiQuery({ name: 'take', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
   @Get("answers")
   getAnswersByRecord(
     @Req() req,
     @Res() res,
     @Query('id') id: string,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
     @Query('order') order: Order
   ) {
     const user = req.user;
-    return this.recordsService.getAnswersByRecord(id, page, limit, order, user)
+    return this.recordsService.getAnswersByRecord(id, skip, take, order, user)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -95,8 +99,8 @@ export class RecordsController {
 
   @ApiResponse({ status: HttpStatus.OK, type: [RecordsResponse] })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
-  @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
-  @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
+  @ApiQuery({ name: 'skip', required: true, type: Number, example: 1})
+  @ApiQuery({ name: 'take', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
   @ApiQuery({ name: 'category', type: String})
   @ApiQuery({ name: 'search', type: String})
@@ -104,23 +108,23 @@ export class RecordsController {
   allRecords(
     @Req() req,
     @Res() res,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
     @Query('order') order: Order,
     @Query('category') category: string,
     @Query('search') search: string,
   ) {
-    console.log("world-- ", page, limit, order, category, search);
+    console.log("world-- ", skip, take, order, category, search);
     const { id } = req.user;
-    return this.recordsService.getRecordsByUser(id, page, limit, order, null, category, search)
+    return this.recordsService.getRecordsByUser(id, skip, take, order, "", category, search)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
   @ApiResponse({ status: HttpStatus.OK, type: [RecordsResponse] })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED })
-  @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
-  @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
+  @ApiQuery({ name: 'skip', required: true, type: Number, example: 1})
+  @ApiQuery({ name: 'take', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
   @ApiQuery({ name: 'category', type: String})
   @ApiQuery({ name: 'search', type: String})
@@ -128,34 +132,50 @@ export class RecordsController {
   allRecordstitles(
     @Req() req,
     @Res() res,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
     @Query('order') order: Order,
     @Query('category') category: string,
     @Query('search') search: string,
   ) {
-    console.log("world-- ", page, limit, order, category, search);
+    console.log("world-- ", skip, take, order, category, search);
     const { id } = req.user;
-    return this.recordsService.getRecordstitle(id, page, limit, order, category, search)
+    return this.recordsService.getRecordstitle(id, skip, take, order, category, search)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
   @ApiResponse({ status: HttpStatus.OK, type: [RecordsResponse] })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
-  @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
-  @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
+  @ApiQuery({ name: 'skip', required: true, type: Number, example: 1})
+  @ApiQuery({ name: 'take', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
   @Get("list")
   records(
     @Req() req,
     @Res() res,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
     @Query('order') order: Order
   ) {
+    console.log("list-- ", skip, take);
     const user = req.user;
-    return this.recordsService.getRecordsByUser(user.id, page, limit, order) //todo add friend records
+    return this.recordsService.getRecordsByUser(user.id, skip, take, order)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse({ status: HttpStatus.OK, type: [ServeralCountResponse] })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @Get("getseveralcount")
+  @ApiQuery({ name: 'other', type: String})
+  getSeveralCount(
+    @Req() req,
+    @Res() res,
+    @Query('other') other: Order
+  ) {
+    const user = req.user;
+    return this.recordsService.getSeveralCounts(user, other)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

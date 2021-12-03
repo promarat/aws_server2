@@ -87,3 +87,14 @@ export class RecordsResponse {
     link: string;
   };
 }
+
+export class ServeralCountResponse {
+  @ApiProperty({ example: 2 })
+  voices: number;
+
+  @ApiProperty({ example: 2 })
+  followers: number;
+
+  @ApiProperty({ example: 2 })
+  following: number;
+}

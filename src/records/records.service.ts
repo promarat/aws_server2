@@ -11,6 +11,8 @@ import { LikesEntity } from "../entities/llikes.entity";
 import { filter, find } from "lodash";
 import { FriendsEntity } from "../entities/friends.entity";
 import { FileTypeEnum } from "../lib/enum";
+import { ServeralCountResponse } from "./dto/records.response";
+import { UsersEntity } from "src/entities/users.entity";
 
 @Injectable()
 export class RecordsService {
@@ -50,10 +52,10 @@ export class RecordsService {
       .getCount();
   }
 
-  async getRecordstitle(userId, page, limit, order, category = "", search = "") {
-    const paginate = paginationHelper(page, limit);
+  async getRecordstitle(userId, skip, take, order, category = "", search = "") {
+    // const paginate = paginationHelper(page, limit);
     const queryBuilder = this.recordsRepository.createQueryBuilder("records")
-      .addSelect([
+      .select([
         "records.title",
       ])
       .where("1=1")
@@ -64,21 +66,43 @@ export class RecordsService {
 
     const records = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
-      .offset(paginate.offset)
-      .limit(paginate.getLimit)
+      // .offset(paginate.offset)
+      // .limit(paginate.getLimit)
+      .skip(skip)
+      .take(take)
       .getMany();
 
     return records;
   }
 
-  async getRecordsByUser(userId, page, limit, order, user = null, category = "", search = "") {
-    const paginate = paginationHelper(page, limit);
+  async getRecordsByUser(me, skip, take, order, user = "", category = "", search = "") {
+    if (user != "" && me != user) {
+      const { count } = await this.friendsRepository
+      .createQueryBuilder('friends')
+      .where("friends.userId = :id", {id: me})
+      .andWhere("friends.friendId = :fid", {fid: user})
+      .andWhere("friends.status = :status", {status: "accepted"})
+      .select([
+        'COUNT(friends.id)'
+      ]).getRawOne();
+
+      const otheruser = await this.usersService.getById(user);
+      if (!otheruser) {
+        throw new NotFoundException();
+      }
+      
+      if ( otheruser.isPrivate && count == 0 ) {
+        throw new BadRequestException("This account is private");
+      }
+    }
+
+    // const paginate = paginationHelper(page, limit);
     const queryBuilder = this.recordsRepository.createQueryBuilder("records")
       .leftJoin("records.user", "user")
       .leftJoin("user.avatar", "avatar")
       .loadRelationCountAndMap("records.answersCount", "records.answers", "answers")
       .leftJoin("records.file", "file")
-      .addSelect([
+      .select([
         "records.id",
         "records.title",
         "records.emoji",
@@ -97,8 +121,8 @@ export class RecordsService {
       .where("1=1")
       ;
 
-    if (user) {
-      await queryBuilder.andWhere({ user: user.id });
+    if (user != "") {
+      await queryBuilder.andWhere({ user: user });
     }
 
     if (category != "")    
@@ -109,15 +133,17 @@ export class RecordsService {
 
     const records = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
-      .offset(paginate.offset)
-      .limit(paginate.getLimit)
+      // .offset(paginate.offset)
+      // .limit(paginate.getLimit)
+      .skip(skip)
+      .take(take)
       .getMany();
     // const usersIds = records.filter((el) => el.user?.id !== userId).map((el) => el.user.id); console.log(usersIds);
     // const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, userId) : [];
     const recordIds = records.map((el) => el.id);
     // const findAnswers = recordIds.length ? await this.getAnswersByRecordIds(recordIds) : [];
     // const likes = recordIds.length ? await this.getRecordLikesById(recordIds) : [];
-    const likes = await this.getRecordLikesByIds(recordIds);
+    const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds) : [];
     return records.map((el) => {
       // const findRecordLikes = filter(likes, (obj) => obj.record.id === el.id);console.log("i--like---", findRecordLikes);
       // const findUserLike = find(findRecordLikes, (obj) => obj.user.id === el.user.id);
@@ -125,11 +151,10 @@ export class RecordsService {
       // const filterAnswers = filter(findAnswers, (obj) => obj.record.id === el.id);
       // const findAnswer = find(filterAnswers, (obj) => obj.user.id === el.user.id);
       const findlikes = filter(likes, (obj) => obj.record.id === el.id);
-      console.log("like-------", findlikes);
       return {
         ...el,
         likes: findlikes && findlikes.length > 3? findlikes.slice(0, 3) : (findlikes ?  findlikes : []),
-        isMine: userId === el.user.id,
+        isMine: me === el.user.id,
         // friend: findFriend ? findFriend.status : userId === el.user.id ? null : "not invited",
         // isAnswered: !!findAnswer
       };
@@ -200,8 +225,8 @@ export class RecordsService {
       .getMany();
   }
 
-  async getAnswersByRecord(id, page, limit, order, user) {
-    const paginate = paginationHelper(page, limit);
+  async getAnswersByRecord(id, skip, take, order, user) {
+    // const paginate = paginationHelper(page, limit);
     const findRecord = await this.recordsRepository.findOne({ where: { id } });
     if (!findRecord) {
       throw new NotFoundException();
@@ -212,7 +237,7 @@ export class RecordsService {
       .leftJoin("answers.user", "user")
       .leftJoin("user.avatar", "avatar")
       .leftJoin("answers.file", "file")
-      .addSelect([
+      .select([
         "answers.id",
         "answers.duration",
         "answers.likesCount",
@@ -226,8 +251,10 @@ export class RecordsService {
       ]);
     const answers = await queryBuilder
       .orderBy("answers.createdAt", order.toUpperCase())
-      .offset(paginate.offset)
-      .limit(paginate.getLimit)
+      // .offset(paginate.offset)
+      // .limit(paginate.getLimit)
+      .skip(skip)
+      .take(take)
       .getMany();
     const answerIds = answers.map((el) => el.id);
     const likes = answerIds.length ? await this.getAnswerLikesByIds(answerIds) : [];
@@ -294,7 +321,54 @@ export class RecordsService {
     return this.recordsRepository.save(findRecord);
   }
 
-  async getSeveralCounts(user, other = null) {
+  async getSeveralCounts(user, other = ""): Promise<any> {
+    var userid = user.id;
+    if (other != "") {
+      userid = other;
+    }
+
+    const voicecount = await this.recordsRepository
+    .createQueryBuilder('records')
+    .where("records.userId = :id", {id: userid})
+    .select([
+      'COUNT(records.id)'
+    ]).getRawOne();
+
+    const followers  = await this.friendsRepository
+    .createQueryBuilder('friends')
+    .where("friends.friendId = :id", {id: userid})
+    .andWhere("friends.status = :status", {status: "accepted"})
+    .select([
+      'COUNT(friends.id)'
+    ]).getRawOne();
     
+    const followings = await this.friendsRepository
+    .createQueryBuilder('friends')
+    .where("friends.userId = :id", {id: userid})
+    .andWhere("friends.status = :status", {status: "accepted"})
+    .select([
+      'COUNT(friends.id)'
+    ]).getRawOne();
+    
+    const findUser = await this.usersService.getById(userid);
+
+    let idFriend = null;
+    if (other != "") {
+      const existFriend = await this.friendsRepository.findOne({ where: { user: user.id, friend: other } });
+      // if (existFriend) {
+        idFriend = existFriend;
+      // }
+    }
+
+    const severalcount: any = {
+      voices: voicecount,
+      followers: followers,
+      followings: followings,
+      user: findUser,
+      isFriend: idFriend
+    };
+    console.log("severalcount--", severalcount);
+    return severalcount;
   }
+
 }

@@ -62,7 +62,6 @@ export class AccountController {
     @Res() res,
     @Body() body: CompleteRegisterDto
   ) {
-    console.log(CompleteRegisterDto);
     const user = req.user;
     return this.accountService.updateProfile(user, body)
       .then((data) => res.json(data))
@@ -98,6 +97,8 @@ export class AccountController {
     @Body() body: AvatarDto
   ) {
     const user = req.user;
+    console.log("avatar--", file);
+    console.log("avatar--", body);
     return this.accountService.addAvatar(user.id, file.buffer, file.originalname)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));

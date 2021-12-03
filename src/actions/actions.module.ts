@@ -14,6 +14,7 @@ import { RecordsService } from "../records/records.service";
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationsEntity } from '../entities/notification.entity';
 import { NotificationsModule } from 'src/notifications/notifications.module';
+import { ReportsEntity } from 'src/entities/reports.entity';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NotificationsModule } from 'src/notifications/notifications.module';
         UsersEntity,
         FriendsEntity,
         CountryEntity,
+        ReportsEntity
       ]),
       NotificationsModule
   ],

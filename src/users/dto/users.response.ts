@@ -29,6 +29,9 @@ export class UsersResponse {
   @ApiModelProperty({ example: false })
   isEmailVerified: boolean;
 
+  @ApiModelProperty({ example: false })
+  isPrivate: boolean;
+
   @ApiProperty()
   gender: string;
 

@@ -15,21 +15,21 @@ export class NotificationsController {
 
   // @ApiResponse({ status: HttpStatus.OK, type: [RecordsResponse] })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
-  @ApiQuery({ name: 'page', required: true, type: Number, example: 1})
-  @ApiQuery({ name: 'limit', required: true, type: Number, example: 10})
+  @ApiQuery({ name: 'skip', required: true, type: Number, example: 1})
+  @ApiQuery({ name: 'take', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
   @ApiQuery({ name: 'type', required: true, type: String})
   @Get("getnotifications")
   getNotifications(
     @Req() req,
     @Res() res,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
     @Query('order') order: Order,
     @Query('type') type: string
   ) {
     const user = req.user; console.log(user);
-    return this.notificationsService.getNotificationsByUser(page, limit, order, type, user)
+    return this.notificationsService.getNotificationsByUser(skip, take, order, type, user)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

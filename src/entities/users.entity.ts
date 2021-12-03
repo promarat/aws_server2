@@ -16,6 +16,7 @@ import { GenderEnum } from "../lib/enum";
 import { FriendsEntity } from "./friends.entity";
 import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
+import { ReportsEntity } from "./reports.entity";
 
 @Entity({ name: "users" })
 @Index(["email"])
@@ -58,6 +59,9 @@ export class UsersEntity {
 
   @Column({ default: false })
   isEmailVerified: boolean;
+
+  @Column({ default: false })
+  isPrivate: boolean;
 
   @Column({
     nullable: true,
@@ -120,6 +124,12 @@ export class UsersEntity {
 
   @OneToMany(type => NotificationsEntity, notificationsFrom => notificationsFrom.fromUser)
   notificationsFrom: NotificationsEntity;
+
+  @OneToMany(type => ReportsEntity, reportFrom => reportFrom.reporter)
+  reportFrom: ReportsEntity;
+
+  @OneToMany(type => ReportsEntity, reportTo => reportTo.target)
+  reportTo: ReportsEntity;
 
   @AfterLoad()
   domainUrl() {

@@ -25,4 +25,7 @@ export class CompleteRegisterDto {
 
   @ApiProperty()
   last: string;
+
+  @ApiProperty()
+  isPriavate: string;
 }

@@ -23,6 +23,7 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileDto } from "../users/dto/file.dto";
 import { LikesRequestDto } from "./dto/likes.request.dto";
+import { ReportRequestDto } from "./dto/report.request";
 
 @Controller("actions")
 @ApiBearerAuth()
@@ -141,7 +142,7 @@ export class ActionsController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
-  @Delete("unfollow")
+  @Get("unfollow")
   @ApiParam({ name: "id", required: true, type: Number })
   async deleteFriend(
     @Req() req,
@@ -173,6 +174,19 @@ export class ActionsController {
     console.log("delete record--", id);
     const user = req.user;
     return this.actionsService.removeRecord(user.id, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("report")
+  @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND })
+  async createReport(
+    @Req() req,
+    @Res() res,
+    @Body() body: ReportRequestDto,
+  ) {
+    const user = req.user;
+    return this.actionsService.createReport(user, body.type, body.target, body.record, body.answer)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

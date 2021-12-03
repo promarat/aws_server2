@@ -15,6 +15,7 @@ import { RecordsEntity } from "./records.entity";
 import { LikesEntity } from "./llikes.entity";
 import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
+import { ReportsEntity } from "./reports.entity";
 
 @Entity({ name: "answers" })
 export class AnswersEntity {
@@ -48,6 +49,9 @@ export class AnswersEntity {
 
   @OneToMany(type => NotificationsEntity, notifications => notifications.answer)
   notifications: NotificationsEntity[];
+
+  @OneToMany(type => ReportsEntity, reports => reports.answer)
+  reports: ReportsEntity[];
 
   @AfterLoad()
   domainUrl() {

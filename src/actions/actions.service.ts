@@ -10,6 +10,7 @@ import { FriendsEntity } from "../entities/friends.entity";
 import { FileTypeEnum, FriendsStatusEnum, NotificationTypeEnum } from "../lib/enum";
 import { CountryEntity } from "../entities/countries.entity";
 import { NotificationsService } from "src/notifications/notifications.service";
+import { ReportsEntity, ReportTypeEnum } from "src/entities/reports.entity";
 
 @Injectable()
 export class ActionsService {
@@ -20,6 +21,7 @@ export class ActionsService {
     @InjectRepository(UsersEntity) private usersRepository: Repository<UsersEntity>,
     @InjectRepository(FriendsEntity) private friendsRepository: Repository<FriendsEntity>,
     @InjectRepository(CountryEntity) private countriesRepository: Repository<CountryEntity>,
+    @InjectRepository(ReportsEntity) private reportsRepository: Repository<ReportsEntity>,
     private readonly filesService: FileService,
     private readonly notificationService: NotificationsService
   ) {
@@ -213,6 +215,10 @@ export class ActionsService {
   }
 
   async followFriend(user, friendId) {
+    if (user.id == friendId) {
+      throw new BadRequestException("nolja??");
+    }
+
     const findFriend = await this.usersRepository.findOne({ where: { id: friendId } });
     if (!findFriend) {
       throw new NotFoundException();
@@ -241,5 +247,37 @@ export class ActionsService {
     }
 
     return this.recordsRepository.delete(findRecord.id);
+  }
+
+  async createReport(user, type: string, target: string, record = "", answer = "") {
+    const targetUser = await this.usersRepository.findOne({ where: { id: target } });
+    if (!targetUser) {
+      throw new NotFoundException();
+    }
+
+    const report = new ReportsEntity();
+    report.reporter = user;
+    report.type = <ReportTypeEnum> type;
+    report.target = targetUser;
+
+    if (record != "") {
+      const reportRecord = await this.recordsRepository.findOne({ where: { id: record } });
+      if (!reportRecord) {
+        throw new NotFoundException("record not found");
+      }
+
+      report.record = reportRecord;
+    }
+
+    if (answer != "") {
+      const reportAnswer = await this.answersRepository.findOne({ where: { id: answer } });
+      if (!reportAnswer) {
+        throw new NotFoundException("answer not found");
+      }
+
+      report.answer = reportAnswer;
+    }
+
+    return await this.reportsRepository.save(report);
   }
 }

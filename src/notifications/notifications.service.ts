@@ -17,23 +17,16 @@ export class NotificationsService {
   constructor(@InjectRepository(NotificationsEntity) private notificationRepository: Repository<NotificationsEntity>) {
   }
 
-  getNotificationsByUser(page, limit, order, type, user): Promise<NotificationsEntity[]> {
-    const paginate = paginationHelper(page, limit);
+  getNotificationsByUser(skip, take, order, type, user): Promise<NotificationsEntity[]> {
+    // const paginate = paginationHelper(page, limit);
     const queryBuilder = this.notificationRepository
       .createQueryBuilder('notifications')
-      .where({ toUser: user.id})
-
-    if ( type !=  NotificationTypeEnum.FRIEND_REQUEST){
-      queryBuilder.andWhere("notifications.type <> :notitype", {notitype: NotificationTypeEnum.FRIEND_REQUEST});
-    }
-    else{
-      queryBuilder.andWhere({type: NotificationTypeEnum.FRIEND_REQUEST});
-    }
-    
-    return queryBuilder.leftJoin('notifications.fromUser', 'fromUser')
+      
+      queryBuilder.leftJoin('notifications.fromUser', 'fromUser')
       .leftJoin("fromUser.avatar", "avatar")
       .leftJoin('notifications.record', 'records')
       .leftJoin('notifications.answer', 'answers')
+      .leftJoin('notifications.friend', 'friends')
       .select([
         'notifications.id',
         'notifications.type',
@@ -43,13 +36,29 @@ export class NotificationsService {
         'records.emoji',
         'answers.id',
         'fromUser.id',
+        'fromUser.name',
+        'friends.id',
         'avatar.url'
         // 'fromUser.pseudo'
-      ])
-      .limit(paginate.getLimit)
-      .offset(paginate.offset)
+      ]);
+      // .limit(paginate.getLimit)
+      // .offset(paginate.offset)
+      queryBuilder.where({ toUser: user.id});
+
+      if ( type !=  NotificationTypeEnum.FRIEND_REQUEST){
+        queryBuilder.andWhere("notifications.type <> :notitype", {notitype: NotificationTypeEnum.FRIEND_REQUEST});
+      }
+      else{
+        queryBuilder.andWhere({type: NotificationTypeEnum.FRIEND_REQUEST});
+      }
+
+    const notifications = queryBuilder
       .orderBy('notifications.createdAt', order)
+      .skip(skip)
+      .take(take)
       .getMany()
+      console.log("notis--", notifications);
+    return notifications;
   }
 
  async seenNotification(user, id = "") {
@@ -114,8 +123,6 @@ export class NotificationsService {
     const UnReadCount: any = {
       count: count
     };
-
-    console.log("UnReadCount--", count, UnReadCount);
     return UnReadCount;
   }
 
@@ -131,8 +138,6 @@ export class NotificationsService {
     const UnReadCount: any = {
       count: count
     };
-
-    console.log("UnReadCount--", count, UnReadCount);
     return UnReadCount;
   }
 }
