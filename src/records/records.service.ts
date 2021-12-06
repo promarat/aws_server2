@@ -146,7 +146,7 @@ export class RecordsService {
     const recordIds = records.map((el) => el.id);
     // const findAnswers = recordIds.length ? await this.getAnswersByRecordIds(recordIds) : [];
     // const likes = recordIds.length ? await this.getRecordLikesById(recordIds) : [];
-    const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds, me.id) : [];
+    const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds, me) : [];
     const recordreactions = recordIds.length ? await this.getReactionsByIds(recordIds) : [];
     return records.map((el) => {
       // const findRecordLikes = filter(likes, (obj) => obj.record.id === el.id);console.log("i--like---", findRecordLikes);
@@ -154,12 +154,12 @@ export class RecordsService {
       // const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
       // const filterAnswers = filter(findAnswers, (obj) => obj.record.id === el.id);
       // const findAnswer = find(filterAnswers, (obj) => obj.user.id === el.user.id);
-      // const findlikes = filter(likes, (obj) => obj.record.id === el.id);
+      const findlikes = filter(likes, (obj) => obj.record.id === el.id);
       const findReactions = filter(recordreactions, (obj) => obj.record.id === el.id);
       const myReactions = filter(findReactions, (obj) => obj.user.id === me);
       return {
         ...el,
-        islike: likes && likes.length > 0 ? true : false,
+        islike: findlikes && findlikes.length > 0 ? true : false,
         reacitons: findReactions && findReactions.length > 3? findReactions.slice(0, 3) : (findReactions ?  findReactions : []),
         isreaction: myReactions && myReactions.length > 0 ? true : false,
         isMine: me === el.user.id,
@@ -210,9 +210,9 @@ export class RecordsService {
   getRecordLikesByIds(ids, userId): Promise<LikesEntity[]> {
     return this.likesRepository
       .createQueryBuilder("likes")
-      .where({ user: userId })
       .innerJoin("likes.record", "record", "record.id in (:...ids)", { ids })
       .leftJoin("likes.user", "user")
+      .where({ user: userId })
       .select([
         "likes.emoji",
         "user.id",
