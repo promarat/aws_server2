@@ -17,6 +17,7 @@ import { FriendsEntity } from "./friends.entity";
 import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
 import { ReportsEntity } from "./reports.entity";
+import { ReactionsEntity } from "./reaction.entity";
 
 @Entity({ name: "users" })
 @Index(["email"])
@@ -112,6 +113,9 @@ export class UsersEntity {
 
   @OneToMany(type => LikesEntity, likes => likes.user)
   likes: LikesEntity[];
+
+  @OneToMany(type => ReactionsEntity, reactions => reactions.user)
+  reactions: ReactionsEntity[];
 
   @OneToMany(type => FriendsEntity, from => from.user)
   from: FriendsEntity;

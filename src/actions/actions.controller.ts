@@ -84,6 +84,22 @@ export class ActionsController {
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
+  
+  @Post("recordreaction")
+  @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "record not found" })
+  @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "reaction exist" })
+  // @ApiParam({ name: "id", type: String, required: true })
+  async recordReaction(
+    @Req() req,
+    @Res() res,
+    @Body() body: LikesRequestDto,
+    // @Param("id") recordId: string
+  ) {
+    const user = req.user;
+    return this.actionsService.reactionRecord(user, body.id, body)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
 
   // @Post("answer/:id/unlike")
   // @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "answer not found" })

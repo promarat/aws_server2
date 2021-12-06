@@ -16,6 +16,7 @@ import { LikesEntity } from "./llikes.entity";
 import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
 import { ReportsEntity } from "./reports.entity";
+// import { ReactionsEntity } from "./reaction.entity";
 
 @Entity({ name: "answers" })
 export class AnswersEntity {
@@ -46,6 +47,9 @@ export class AnswersEntity {
 
   @OneToMany(type => LikesEntity, likes => likes.answer) //todo remove with record?
   likes: LikesEntity[];
+
+  // @OneToMany(type => ReactionsEntity, reactions => reactions.answer) //todo remove with record?
+  // reactions: ReactionsEntity[];
 
   @OneToMany(type => NotificationsEntity, notifications => notifications.answer)
   notifications: NotificationsEntity[];

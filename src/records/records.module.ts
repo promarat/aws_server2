@@ -10,6 +10,7 @@ import { UsersEntity } from "../entities/users.entity";
 import { AnswersEntity } from "../entities/answers.entity";
 import { LikesEntity } from "../entities/llikes.entity";
 import { FriendsEntity } from "../entities/friends.entity";
+import { ReactionsEntity } from 'src/entities/reaction.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { FriendsEntity } from "../entities/friends.entity";
         AnswersEntity,
         LikesEntity,
         FriendsEntity,
+        ReactionsEntity
       ])
   ],
   providers: [RecordsService, FileService, UsersService],

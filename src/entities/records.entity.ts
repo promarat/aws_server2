@@ -16,6 +16,7 @@ import { LikesEntity } from "./llikes.entity";
 import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
 import { ReportsEntity } from "./reports.entity";
+import { ReactionsEntity } from "./reaction.entity";
 
 
 @Entity({ name: "records" })
@@ -41,6 +42,9 @@ export class RecordsEntity {
   @Column({ nullable: true , default: 0})
   likesCount: number
 
+  @Column({ nullable: true , default: 0})
+  reactionsCount: number
+
   @Column({ nullable: true })
   colorType: number
 
@@ -62,6 +66,9 @@ export class RecordsEntity {
 
   @OneToMany(type => LikesEntity, likes => likes.record)
   likes: LikesEntity[];
+
+  @OneToMany(type => ReactionsEntity, reactions => reactions.record)
+  reactions: ReactionsEntity[];
 
   @OneToMany(type => NotificationsEntity, notifications => notifications.record)
   notifications: NotificationsEntity[];

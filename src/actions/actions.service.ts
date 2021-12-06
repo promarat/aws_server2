@@ -11,12 +11,14 @@ import { FileTypeEnum, FriendsStatusEnum, NotificationTypeEnum } from "../lib/en
 import { CountryEntity } from "../entities/countries.entity";
 import { NotificationsService } from "src/notifications/notifications.service";
 import { ReportsEntity, ReportTypeEnum } from "src/entities/reports.entity";
+import { ReactionsEntity } from "src/entities/reaction.entity";
 
 @Injectable()
 export class ActionsService {
   constructor(
     @InjectRepository(AnswersEntity) private answersRepository: Repository<AnswersEntity>,
     @InjectRepository(LikesEntity) private likesRepository: Repository<LikesEntity>,
+    @InjectRepository(ReactionsEntity) private reactionsRepository: Repository<ReactionsEntity>,
     @InjectRepository(RecordsEntity) private recordsRepository: Repository<RecordsEntity>,
     @InjectRepository(UsersEntity) private usersRepository: Repository<UsersEntity>,
     @InjectRepository(FriendsEntity) private friendsRepository: Repository<FriendsEntity>,
@@ -83,7 +85,7 @@ export class ActionsService {
     like.user = await this.usersRepository.findOne({ where: { id: user.id } });
     like.record = record;
     like.type = LikeTypeEnum.RECORD;
-    like.emoji = body.emoji;
+    like.emoji = ""; // body.emoji;
     getConnection().createQueryBuilder().update("records").set({ likesCount : record.likesCount + 1 }).where({ id: record.id}).execute();
 
     await this.likesRepository
@@ -93,6 +95,48 @@ export class ActionsService {
       .values(like)
       .execute();
     return like;
+  }
+
+  async reactionRecord(user, recordId: string, body) {
+    const record = await this.recordsRepository.createQueryBuilder("record")
+      .leftJoin('record.user', 'user')
+      .where({ id: recordId })
+      .select(["record.id", "record.reactionsCount", "user.id"])
+      .getOne();
+    if (!record) {
+      throw new NotFoundException();
+    }
+    
+    const existingReaction = await this.reactionsRepository.findOne({
+        where: {
+          user: user.id,
+          record: recordId
+        }
+      }
+    );
+    if (existingReaction) {
+      throw new BadRequestException("already reaction");
+    }
+
+    // if (record.user.id != user.id) {
+    //   const touser = await this.usersRepository.findOne({ where: { id: record.user.id } });
+    //   this.notificationService.sendNotification(user, touser, record, null, null, NotificationTypeEnum.LIKE_RECORD);
+    // }
+
+    const reaction = new ReactionsEntity();
+    reaction.user = await this.usersRepository.findOne({ where: { id: user.id } });
+    reaction.record = record;
+    reaction.emoji = body.emoji;
+    getConnection().createQueryBuilder().update("records").set({ reactionsCount : record.reactionsCount + 1 }).where({ id: record.id}).execute();
+
+    await this.reactionsRepository
+    .createQueryBuilder()
+    .insert()
+    .into(ReactionsEntity)
+    .values(reaction)
+    .execute();
+
+    return reaction;
   }
 
   async likeAnswer(user, answerId: string, body) {

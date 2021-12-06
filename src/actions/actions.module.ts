@@ -15,6 +15,7 @@ import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationsEntity } from '../entities/notification.entity';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { ReportsEntity } from 'src/entities/reports.entity';
+import { ReactionsEntity } from 'src/entities/reaction.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ReportsEntity } from 'src/entities/reports.entity';
       [
         AnswersEntity,
         LikesEntity,
+        ReactionsEntity,
         RecordsEntity,
         PublicFileEntity,
         UsersEntity,

@@ -13,6 +13,7 @@ import { FriendsEntity } from "../entities/friends.entity";
 import { FileTypeEnum } from "../lib/enum";
 import { ServeralCountResponse } from "./dto/records.response";
 import { UsersEntity } from "src/entities/users.entity";
+import { ReactionsEntity } from "src/entities/reaction.entity";
 
 @Injectable()
 export class RecordsService {
@@ -21,6 +22,7 @@ export class RecordsService {
     @InjectRepository(RecordsEntity) private recordsRepository: Repository<RecordsEntity>,
     @InjectRepository(AnswersEntity) private answersRepository: Repository<AnswersEntity>,
     @InjectRepository(LikesEntity) private likesRepository: Repository<LikesEntity>,
+    @InjectRepository(ReactionsEntity) private reactionsRepository: Repository<ReactionsEntity>,
     @InjectRepository(FriendsEntity) private friendsRepository: Repository<FriendsEntity>,
     private readonly filesService: FileService,
     private readonly usersService: UsersService
@@ -109,6 +111,7 @@ export class RecordsService {
         "records.duration",
         "records.colorType",
         "records.likesCount",
+        "records.reactionsCount",
         "records.createdAt",
         "user.id",
         "user.pseudo",
@@ -143,17 +146,22 @@ export class RecordsService {
     const recordIds = records.map((el) => el.id);
     // const findAnswers = recordIds.length ? await this.getAnswersByRecordIds(recordIds) : [];
     // const likes = recordIds.length ? await this.getRecordLikesById(recordIds) : [];
-    const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds) : [];
+    const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds, me.id) : [];
+    const recordreactions = recordIds.length ? await this.getReactionsByIds(recordIds) : [];
     return records.map((el) => {
       // const findRecordLikes = filter(likes, (obj) => obj.record.id === el.id);console.log("i--like---", findRecordLikes);
       // const findUserLike = find(findRecordLikes, (obj) => obj.user.id === el.user.id);
       // const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
       // const filterAnswers = filter(findAnswers, (obj) => obj.record.id === el.id);
       // const findAnswer = find(filterAnswers, (obj) => obj.user.id === el.user.id);
-      const findlikes = filter(likes, (obj) => obj.record.id === el.id);
+      // const findlikes = filter(likes, (obj) => obj.record.id === el.id);
+      const findReactions = filter(recordreactions, (obj) => obj.record.id === el.id);
+      const myReactions = filter(findReactions, (obj) => obj.user.id === me);
       return {
         ...el,
-        likes: findlikes && findlikes.length > 3? findlikes.slice(0, 3) : (findlikes ?  findlikes : []),
+        islike: likes && likes.length > 0 ? true : false,
+        reacitons: findReactions && findReactions.length > 3? findReactions.slice(0, 3) : (findReactions ?  findReactions : []),
+        isreaction: myReactions && myReactions.length > 0 ? true : false,
         isMine: me === el.user.id,
         // friend: findFriend ? findFriend.status : userId === el.user.id ? null : "not invited",
         // isAnswered: !!findAnswer
@@ -199,13 +207,27 @@ export class RecordsService {
       .getMany();
   }
 
-  getRecordLikesByIds(ids): Promise<LikesEntity[]> {
+  getRecordLikesByIds(ids, userId): Promise<LikesEntity[]> {
     return this.likesRepository
       .createQueryBuilder("likes")
+      .where({ user: userId })
       .innerJoin("likes.record", "record", "record.id in (:...ids)", { ids })
       .leftJoin("likes.user", "user")
       .select([
         "likes.emoji",
+        "user.id",
+        "record.id"
+      ])
+      .getMany();
+  }
+
+  getReactionsByIds(ids): Promise<ReactionsEntity[]> {
+    return this.reactionsRepository
+      .createQueryBuilder("reactions")
+      .innerJoin("reactions.record", "record", "record.id in (:...ids)", { ids })
+      .leftJoin("reactions.user", "user")
+      .select([
+        "reactions.emoji",
         "user.id",
         "record.id"
       ])
@@ -243,11 +265,14 @@ export class RecordsService {
         "answers.likesCount",
         "answers.createdAt",
         "user.id",
+        "user.name",
         "user.pseudo",
         "user.avatar",
         "file.id",
         "file.link",
-        "avatar.link"
+        "file.url",
+        "avatar.link",
+        "avatar.url"
       ]);
     const answers = await queryBuilder
       .orderBy("answers.createdAt", order.toUpperCase())
