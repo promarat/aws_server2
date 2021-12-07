@@ -234,11 +234,12 @@ export class RecordsService {
       .getMany();
   }
 
-  getAnswerLikesByIds(ids): Promise<LikesEntity[]> {
+  getAnswerLikesByIds(ids, userId): Promise<LikesEntity[]> {
     return this.likesRepository
       .createQueryBuilder("likes")
       .innerJoin("likes.answer", "answer", "answer.id in (:...ids)", { ids })
       .leftJoin("likes.user", "user")
+      .where({ user: userId })
       .select([
         "likes.id",
         "user.id",
@@ -282,13 +283,13 @@ export class RecordsService {
       .take(take)
       .getMany();
     const answerIds = answers.map((el) => el.id);
-    const likes = answerIds.length ? await this.getAnswerLikesByIds(answerIds) : [];
+    const likes = answerIds.length ? await this.getAnswerLikesByIds(answerIds, user.id) : [];
     return answers.map((el) => {
       const findAnswerLikes = filter(likes, (obj) => obj.answer.id === el.id);
-      const findUserLike = find(findAnswerLikes, (obj) => obj.user.id === el.user.id);
+      // const findUserLike = find(findAnswerLikes, (obj) => obj.user.id === el.user.id);
       return {
         ...el,
-        isLiked: findUserLike ? true : false,
+        isLiked: findAnswerLikes && findAnswerLikes.length > 0 ? true : false,
         isMine: el.user.id === user.id
       };
     });
