@@ -63,6 +63,9 @@ export class RecordsService {
       .where("1=1")
       ;
     
+    if (category != "")    
+      await queryBuilder.andWhere({ category: category })
+      
     if (search != "")
       await queryBuilder.andWhere("records.title ILIKE :titlesearch", {titlesearch: '' + search + '%'})
 
