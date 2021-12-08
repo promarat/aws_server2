@@ -10,3 +10,8 @@ export class EmailVerify {
   @MaxLength(20)
   pseudo: string;
 }
+
+export class UsernameVerifyResponse {
+  @ApiModelProperty({example: 'OK', description: 'count of answers today'})
+  resp: string;
+}

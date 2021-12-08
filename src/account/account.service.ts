@@ -5,7 +5,7 @@ import { RecordsService } from "../records/records.service";
 import { FileService } from "../files/file.service";
 import { FileTypeEnum } from "../lib/enum";
 import { GenderEnum } from "../lib/enum";
-import { EmailVerify } from "./dto/emailverify.dto";
+import { EmailVerify, UsernameVerifyResponse } from "./dto/emailverify.dto";
 import { find } from "rxjs";
 import { UsersEntity } from "src/entities/users.entity";
 import { GeneratorUtil } from "../lib/generator-util";
@@ -99,5 +99,18 @@ export class AccountService {
     }
     else
       throw new BadRequestException("NewEmail Verify Faild");
+  }
+
+  async usernameVerify(user, username) {
+    const findUser = await this.usersService.findByName(user.id, username);console.log(findUser);
+    if (findUser && findUser.length > 0) {
+      throw new BadRequestException("username is already taken");
+    }
+    else{
+      const payload: any = {
+        resp: 'OK',
+      };
+      return payload;
+    }
   }
 }

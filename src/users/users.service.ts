@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UsersEntity } from "../entities/users.entity";
-import { Repository } from "typeorm";
+import { Repository, Not, MoreThan } from "typeorm";
 import { GeneratorUtil } from "../lib/generator-util";
 
 @Injectable()
@@ -67,6 +67,16 @@ export class UsersService {
 
   findById(id: string) {
     return this.usersRepository.findOne({ where: { id }, relations: ["avatar"] });
+  }
+
+  findByName(id: string, username: string) {
+    return this.usersRepository.createQueryBuilder('user')
+      .where( { name: username})
+      .andWhere( "user.id <> :userid", {userid : id} )
+      .select( [
+        "user.id",
+      ])
+      .getMany()
   }
 
   createUser(newUser: UsersEntity): Promise<UsersEntity> {

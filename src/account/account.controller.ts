@@ -149,4 +149,18 @@ export class AccountController {
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
+
+  @Post("verifyusername")
+  @ApiCreatedResponse({ status: HttpStatus.OK, description: "username is available" })
+  @ApiParam({ name: "username", required: true, type: String })
+  async verifyUsername(
+    @Req() req,
+    @Res() res,
+    @Query("username") username: string,
+  ) {
+    const user = req.user;console.log(user, username);
+    return this.accountService.usernameVerify(user, username)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
 }
