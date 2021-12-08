@@ -163,7 +163,7 @@ export class RecordsService {
       return {
         ...el,
         islike: findlikes && findlikes.length > 0 ? true : false,
-        reacitons: findReactions && findReactions.length > 3? findReactions.slice(0, 3) : (findReactions ?  findReactions : []),
+        reactions: findReactions && findReactions.length > 3? findReactions.slice(0, 3) : (findReactions ?  findReactions : []),
         isreaction: myReactions && myReactions.length > 0 ? true : false,
         isMine: me === el.user.id,
         // friend: findFriend ? findFriend.status : userId === el.user.id ? null : "not invited",
@@ -234,6 +234,7 @@ export class RecordsService {
         "user.id",
         "record.id"
       ])
+      .orderBy("reactions.createdAt", "DESC")
       .getMany();
   }
 
