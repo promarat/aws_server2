@@ -12,6 +12,7 @@ import { CountryEntity } from "../entities/countries.entity";
 import { NotificationsService } from "src/notifications/notifications.service";
 import { ReportsEntity, ReportTypeEnum } from "src/entities/reports.entity";
 import { ReactionsEntity } from "src/entities/reaction.entity";
+import { filter, find } from "lodash";
 
 @Injectable()
 export class ActionsService {
@@ -107,6 +108,7 @@ export class ActionsService {
       throw new NotFoundException();
     }
     
+    let addcount = 1;
     const existingReaction = await this.reactionsRepository.findOne({
         where: {
           user: user.id,
@@ -115,7 +117,8 @@ export class ActionsService {
       }
     );
     if (existingReaction) {
-      throw new BadRequestException("already reaction");
+      this.reactionsRepository.remove(existingReaction);
+      addcount = 0;
     }
 
     // if (record.user.id != user.id) {
@@ -127,7 +130,7 @@ export class ActionsService {
     reaction.user = await this.usersRepository.findOne({ where: { id: user.id } });
     reaction.record = record;
     reaction.emoji = body.emoji;
-    getConnection().createQueryBuilder().update("records").set({ reactionsCount : record.reactionsCount + 1 }).where({ id: record.id}).execute();
+    getConnection().createQueryBuilder().update("records").set({ reactionsCount : record.reactionsCount + addcount }).where({ id: record.id}).execute();
 
     await this.reactionsRepository
     .createQueryBuilder()
@@ -136,7 +139,25 @@ export class ActionsService {
     .values(reaction)
     .execute();
 
-    return reaction;
+    const recordreactions = await this.getReactionsByIds([recordId]);
+    const findReactions = filter(recordreactions, (obj) => obj.record.id === recordId);
+    return findReactions && findReactions.length > 3? findReactions.slice(0, 3) : (findReactions ?  findReactions : []);
+    // return reaction;
+  }
+
+  getReactionsByIds(ids): Promise<ReactionsEntity[]> {
+    return this.reactionsRepository
+      .createQueryBuilder("reactions")
+      .innerJoin("reactions.record", "record", "record.id in (:...ids)", { ids })
+      .leftJoin("reactions.user", "user")
+      .select([
+        "reactions.id",
+        "reactions.emoji",
+        "user.id",
+        "record.id"
+      ])
+      .orderBy("reactions.createdAt", "DESC")
+      .getMany();
   }
 
   async likeAnswer(user, answerId: string, body) {
