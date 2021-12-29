@@ -141,7 +141,13 @@ export class ActionsService {
 
     const recordreactions = await this.getReactionsByIds([recordId]);
     const findReactions = filter(recordreactions, (obj) => obj.record.id === recordId);
-    return findReactions && findReactions.length > 3? findReactions.slice(0, 3) : (findReactions ?  findReactions : []);
+    const payload: any = {
+      last: 'OK',
+    };
+    return {
+      lastreactions: findReactions && findReactions.length > 3? findReactions.slice(0, 3) : (findReactions ?  findReactions : []),
+      reactioncount: findReactions && findReactions.length > 0 ? findReactions.length : 0
+    }
     // return reaction;
   }
 
