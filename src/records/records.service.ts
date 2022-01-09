@@ -401,4 +401,23 @@ export class RecordsService {
     return severalcount;
   }
 
+  async getTotalRecord() {
+    return {
+      count: await this.recordsRepository.count()
+    }
+  }
+
+  async getRecordSeconds() {
+    return {
+      total: await this.recordsRepository.createQueryBuilder("records")
+      .select("SUM(records.duration::numeric::integer)", "sum")
+      .getRawOne()
+    }
+  }
+
+  async getTotalFriendRequest() {
+    return {
+      count: await this.friendsRepository.count({where: {status: "accepted"}})
+    }
+  }
 }

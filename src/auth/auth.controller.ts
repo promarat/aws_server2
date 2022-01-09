@@ -23,6 +23,8 @@ import { LoginResponse } from "./dto/login.response";
 import { LoginRequest } from "./dto/login.request";
 import { SubScribeRequest } from "./dto/subscribe.request";
 import { SubScribeService } from "./subscripbe/subscribe.service"
+import { RecordsService } from "src/records/records.service";
+import { UsersService } from "../users/users.service";
 
 @Controller()
 @ApiTags("auth")
@@ -33,7 +35,9 @@ export class AuthController {
     private authService: AuthService,
     private mailService: MailService,
     private tokenService: TokenService,
-    private subScribeService: SubScribeService
+    private subScribeService: SubScribeService,
+    private recordsService: RecordsService,
+    private usersService: UsersService,
   ) {
   }
 
@@ -180,6 +184,76 @@ export class AuthController {
     @Body() requestbody: SubScribeRequest,
   ): Promise<SubScribeRequest> {
     return await this.subScribeService.addSubScribe(requestbody)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getsubscribecount")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getSubScribeCount(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.subScribeService.getSubScribeCount()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("gettotalrecord")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getTotalRecord(
+    @Res() res,
+  ) {
+    return await this.recordsService.getTotalRecord()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getrecordseconds")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getRecordSeconds(
+    @Res() res,
+  ) {
+    return await this.recordsService.getRecordSeconds()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getmfpercent")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getMFPercent(
+    @Res() res,
+  ) {
+    return await this.usersService.getMFPercent()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getaverage")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getAverAge(
+    @Res() res,
+  ) {
+    return await this.usersService.getAverAge()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("gettotalinteractions")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getTotalInteractions(
+    @Res() res,
+  ) {
+    return await this.usersService.getAverAge()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("gettotalfriendrequest")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getTotalFriendRequest(
+    @Res() res,
+  ) {
+    return await this.recordsService.getTotalFriendRequest()
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

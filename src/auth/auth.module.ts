@@ -23,6 +23,12 @@ import { RecordsController } from "../records/records.controller";
 import { SubScribeService } from "./subscripbe/subscribe.service";
 import { SubScribeEntity } from "../entities/subscribe.entity";
 import { NotificationsController } from "src/notifications/notifications.controller";
+import { RecordsService } from "src/records/records.service";
+import { RecordsEntity } from "src/entities/records.entity";
+import { AnswersEntity } from "src/entities/answers.entity";
+import { LikesEntity } from "src/entities/llikes.entity";
+import { ReactionsEntity } from "src/entities/reaction.entity";
+import { FriendsEntity } from "src/entities/friends.entity";
 
 @Module({
   imports: [
@@ -33,7 +39,12 @@ import { NotificationsController } from "src/notifications/notifications.control
         RefreshTokenEntity,
         PasswordResetEntity,
         PublicFileEntity,
-        SubScribeEntity
+        SubScribeEntity,
+        RecordsEntity,
+        AnswersEntity,
+        LikesEntity,
+        ReactionsEntity,
+        FriendsEntity,
       ])
   ],
   providers: [
@@ -45,6 +56,7 @@ import { NotificationsController } from "src/notifications/notifications.control
     MailService,
     TokenService,
     SubScribeService,
+    RecordsService
   ],
   controllers: [AuthController],
   exports: [AuthService]
@@ -93,6 +105,34 @@ export class AuthModule implements NestModule {
         {
           path: 'subscribe',
           method: RequestMethod.POST,
+        },
+        {
+          path: 'getsubscribecount',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'gettotalrecord',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getrecordseconds',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getmfpercent',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getaverage',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'gettotalinteractions',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'gettotalfriendrequest',
+          method: RequestMethod.GET,
         }
       )
       .forRoutes(
@@ -142,6 +182,34 @@ export class AuthModule implements NestModule {
         {
           path: 'subscribe',
           method: RequestMethod.POST,
+        },
+        {
+          path: 'getsubscribecount',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'gettotalrecord',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getrecordseconds',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getmfpercent',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getaverage',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'gettotalinteractions',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'gettotalfriendrequest',
+          method: RequestMethod.GET,
         }
       )
       .forRoutes(AuthController);

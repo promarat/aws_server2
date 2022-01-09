@@ -32,4 +32,11 @@ export class SubScribeService {
     subscribe.email = newUser.email;
     return this.subscribeRepository.save(subscribe);
   }
+
+  async getSubScribeCount() {
+    const count = await this.subscribeRepository.count();
+    return {
+      count: count
+    };
+  }
 }

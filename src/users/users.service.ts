@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { UsersEntity } from "../entities/users.entity";
 import { Repository, Not, MoreThan } from "typeorm";
 import { GeneratorUtil } from "../lib/generator-util";
+import { maxLength } from "class-validator";
 
 @Injectable()
 export class UsersService {
@@ -99,4 +100,19 @@ export class UsersService {
       .getMany()
   }
 
+  async getMFPercent() {
+    return {
+      male: await this.usersRepository.count({where: {gender: "m"}}),
+      female: await this.usersRepository.count({where: {gender: "f"}})
+    }
+  }
+
+  async getAverAge() {
+    return {
+      total: await this.usersRepository.createQueryBuilder("users")
+      .select("AVG(SUBSTRING(CAST(users.dob AS VARCHAR), 1, 4)::numeric::integer)", "avg")
+      .where('users.dob is not null')
+      .getRawOne()
+    }
+  }
 }
