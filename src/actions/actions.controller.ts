@@ -49,7 +49,7 @@ export class ActionsController {
     @Body() body: FileDto
   ) {
     const user = req.user;
-    return this.actionsService.answerToRecord(user, body.record, body.duration, file.buffer, file.originalname)
+    return this.actionsService.answerToRecord(user, body.record, body.duration, body.emoji, file.buffer, file.originalname)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

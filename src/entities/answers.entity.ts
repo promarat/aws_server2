@@ -29,6 +29,9 @@ export class AnswersEntity {
   @Column({ nullable: true, default: 0 })
   likesCount: number;
 
+  @Column({ nullable: true })
+  emoji: string;
+
   @CreateDateColumn({
     type: "timestamp without time zone",
     name: "createdAt"

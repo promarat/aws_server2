@@ -268,6 +268,7 @@ export class RecordsService {
         "answers.id",
         "answers.duration",
         "answers.likesCount",
+        "answers.emoji",
         "answers.createdAt",
         "user.id",
         "user.name",

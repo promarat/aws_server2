@@ -11,4 +11,7 @@ export class FileDto {
 
   @ApiProperty({ example: "9daaf749-6202-4b6f-86fc-133ce7ed8c23" })
   record: string;
+
+  @ApiModelProperty({ type: 'string', example: '😎'})
+  emoji: string;
 }

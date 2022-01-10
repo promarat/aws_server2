@@ -30,7 +30,7 @@ export class ActionsService {
   ) {
   }
 
-  async answerToRecord(user, record, duration, buffer, filename) {
+  async answerToRecord(user, record, duration, emoji, buffer, filename) {
     const findRecord = await this.recordsRepository.createQueryBuilder("record")
       .leftJoin('record.user', 'user')
       .where({ id: record })
@@ -53,6 +53,7 @@ export class ActionsService {
     entity.file = uploadFile;
     entity.createdAt = new Date();
     entity.user = user;
+    entity.emoji = emoji;
     return this.answersRepository.save(entity);
   }
 
