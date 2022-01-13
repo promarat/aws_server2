@@ -243,7 +243,7 @@ export class AuthController {
   async getTotalInteractions(
     @Res() res,
   ) {
-    return await this.usersService.getAverAge()
+    return await this.recordsService.getTotalInteraction()
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

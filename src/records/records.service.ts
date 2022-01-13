@@ -421,4 +421,31 @@ export class RecordsService {
       count: await this.friendsRepository.count({where: {status: "accepted"}})
     }
   }
+
+  async getTotalInteraction() {
+    const recordCount = await this.recordsRepository.count();
+
+    const reactionsCount = await this.recordsRepository.createQueryBuilder("records")
+      .select("SUM(records.reactionsCount)", "sum")
+      .getRawOne()
+
+    const answers = await this.recordsRepository.createQueryBuilder("records")
+      .loadRelationCountAndMap("records.answersCount", "records.answers", "answers")
+      .select("records.id")
+      .getMany();
+
+    const answer_ = answers.map((el) => {
+      const e: any = {...el};
+      return e;
+    });
+    let answerCount = 0;
+    answer_.map((el)=>{
+      answerCount += parseInt(el.answersCount);
+    });
+    console.log("reactionCount--", recordCount, reactionsCount, answerCount);
+        
+    return {
+      count: recordCount + parseInt(reactionsCount.sum) + answerCount
+    }
+  }
 }
