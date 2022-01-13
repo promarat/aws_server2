@@ -429,20 +429,7 @@ export class RecordsService {
       .select("SUM(records.reactionsCount)", "sum")
       .getRawOne()
 
-    const answers = await this.recordsRepository.createQueryBuilder("records")
-      .loadRelationCountAndMap("records.answersCount", "records.answers", "answers")
-      .select("records.id")
-      .getMany();
-
-    const answer_ = answers.map((el) => {
-      const e: any = {...el};
-      return e;
-    });
-    let answerCount = 0;
-    answer_.map((el)=>{
-      answerCount += parseInt(el.answersCount);
-    });
-    console.log("reactionCount--", recordCount, reactionsCount, answerCount);
+    const answerCount = await this.answersRepository.count();
         
     return {
       count: recordCount + parseInt(reactionsCount.sum) + answerCount
