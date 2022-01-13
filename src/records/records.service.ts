@@ -429,10 +429,10 @@ export class RecordsService {
       .select("SUM(records.reactionsCount)", "sum")
       .getRawOne()
 
-    const answerCount = await this.answersRepository.count();
+    const answersCount = await this.answersRepository.count();
         
     return {
-      count: recordCount + parseInt(reactionsCount.sum) + answerCount
+      count: recordCount + parseInt(reactionsCount.sum) + answersCount
     }
   }
 }
