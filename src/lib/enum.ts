@@ -9,6 +9,12 @@ export enum GenderEnum {
   OTHER = 'other'
 }
 
+export enum PremiumEnum {
+  NONE = 'none',
+  MONTHLY = 'monthly',
+  YEARLY = 'yearly'
+}
+
 export enum FriendsStatusEnum {
   ACCEPTED = 'accepted',
   PENDING = 'pending',

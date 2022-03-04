@@ -13,6 +13,7 @@ import { RecordsEntity } from "./records.entity";
 import { AnswersEntity } from "./answers.entity";
 import { LikesEntity } from "./llikes.entity";
 import { GenderEnum } from "../lib/enum";
+import { PremiumEnum } from "../lib/enum";
 import { FriendsEntity } from "./friends.entity";
 import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
@@ -70,6 +71,13 @@ export class UsersEntity {
     enum: GenderEnum,
   })
   gender: GenderEnum;
+
+  @Column({
+    default:PremiumEnum.NONE,
+    type: 'enum',
+    enum: PremiumEnum,
+  })
+  premium: PremiumEnum;
   
   @Column({nullable: true})
   country: string;

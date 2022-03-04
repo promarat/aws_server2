@@ -68,6 +68,20 @@ export class AccountController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Post("changepremium")
+  @ApiCreatedResponse({ status: HttpStatus.CREATED, type: UsersResponse, description: "Premium State Changed Correctly" })
+  @ApiParam({ name: "premium_state", type: String, required: true })
+  async likeRecord(
+    @Req() req,
+    @Res() res,
+    @Query("premium_state") premium_state: string,
+  ) {
+    const user = req.user;
+    return this.accountService.changePremium(user, premium_state)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
   @Post("emailverify")
   @ApiCreatedResponse({ status: HttpStatus.CREATED,  description: "" })
   @ApiUnauthorizedResponse()

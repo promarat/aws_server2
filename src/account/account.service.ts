@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { UsersService } from "../users/users.service";
 import { CompleteRegisterDto } from "./dto/complete-register.dto";
 import { RecordsService } from "../records/records.service";
+import { PremiumEnum } from "../lib/enum";
 import { FileService } from "../files/file.service";
 import { FileTypeEnum } from "../lib/enum";
 import { GenderEnum } from "../lib/enum";
@@ -63,6 +64,12 @@ export class AccountService {
     }
     else
       throw new BadRequestException("Email Verify Faild");
+  }
+
+  async changePremium(user, premium_state){
+    const findUser = await this.usersService.findById(user.id);
+    findUser.premium = <PremiumEnum>premium_state;
+    return this.usersService.completeRegister(findUser);
   }
 
   async resetpassword(user, oldpassword, newpassword) {
