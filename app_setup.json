@@ -25,9 +25,9 @@
   },
   
   "database": {
-    "database_address": "database-1.ctgujnk2flou.us-east-2.rds.amazonaws.com",
+    "database_address": "34.79.60.221",
     "database_port": 5432,
-    "database_name": "social_voice",
+    "database_name": "postgres",
     "database_login": "postgres",
     "database_password": "postgres"
   },
