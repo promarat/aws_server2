@@ -120,6 +120,7 @@ export class RecordsService {
         "user.pseudo",
         "user.avatar",
         "user.name",
+        "user.premium",
         "file.id",
         "file.url",
         "avatar.url"
