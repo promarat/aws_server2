@@ -103,10 +103,10 @@ export class RecordsService {
 
     // const paginate = paginationHelper(page, limit);
     const queryBuilder = this.recordsRepository.createQueryBuilder("records")
-      .leftJoin("records.user", "user")
-      .leftJoin("user.avatar", "avatar")
+      // .leftJoin("records.user", "user")
+      // .leftJoin("user.avatar", "avatar")
       .loadRelationCountAndMap("records.answersCount", "records.answers", "answers")
-      .leftJoin("records.file", "file")
+      // .leftJoin("records.file", "file")
       .select([
         "records.id",
         "records.title",
@@ -116,14 +116,14 @@ export class RecordsService {
         "records.likesCount",
         "records.reactionsCount",
         "records.createdAt",
-        "user.id",
-        "user.pseudo",
-        "user.avatar",
-        "user.name",
-        "user.premium",
-        "file.id",
-        "file.url",
-        "avatar.url"
+        "records.user.id",
+        "records.user.pseudo",
+        "records.user.avatar",
+        "records.user.name",
+        "records.user.premium",
+        "records.file.id",
+        "records.file.url",
+        "records.user.avatar.url"
       ])
       .where("1=1")
       ;
