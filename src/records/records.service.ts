@@ -81,27 +81,27 @@ export class RecordsService {
   }
 
   async getRecordsByUser(me, skip, take, order, user = "", category = "", search = "") {
-    // if (user != "" && me != user) {
-    //   const { count } = await this.friendsRepository
-    //   .createQueryBuilder('friends')
-    //   .where("friends.userId = :id", {id: me})
-    //   .andWhere("friends.friendId = :fid", {fid: user})
-    //   .andWhere("friends.status = :status", {status: "accepted"})
-    //   .select([
-    //     'COUNT(friends.id)'
-    //   ]).getRawOne();
+    if (user != "" && me != user) {
+      const { count } = await this.friendsRepository
+      .createQueryBuilder('friends')
+      .where("friends.userId = :id", {id: me})
+      .andWhere("friends.friendId = :fid", {fid: user})
+      .andWhere("friends.status = :status", {status: "accepted"})
+      .select([
+        'COUNT(friends.id)'
+      ]).getRawOne();
 
-    //   const otheruser = await this.usersService.getById(user);
-    //   if (!otheruser) {
-    //     throw new NotFoundException();
-    //   }
+      const otheruser = await this.usersService.getById(user);
+      if (!otheruser) {
+        throw new NotFoundException();
+      }
       
-    //   if ( otheruser.isPrivate && count == 0 ) {
-    //     throw new BadRequestException("This account is private");
-    //   }
-    // }
+      if ( otheruser.isPrivate && count == 0 ) {
+        throw new BadRequestException("This account is private");
+      }
+    }
 
-    // const paginate = paginationHelper(page, limit);
+    const paginate = paginationHelper(page, limit);
     const queryBuilder = this.recordsRepository.createQueryBuilder("records")
       .leftJoin("records.user", "user")
       .leftJoin("user.avatar", "avatar")
