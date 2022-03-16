@@ -113,6 +113,7 @@ export class RecordsService {
         "records.emoji",
         "records.duration",
         "records.colorType",
+        "records.category",
         "records.likesCount",
         "records.reactionsCount",
         "records.createdAt",
