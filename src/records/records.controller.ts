@@ -116,9 +116,8 @@ export class RecordsController {
   ) {
     console.log("world-- ", skip, take, order, category, search);
     const { id } = req.user;
-    console.log("SSSSSSSSSSSSS");
     return this.recordsService.getRecordsByUser(id, skip, take, order, "", category, search)
-      .then((data) => {console.log("EEEEEEEEEEEEE");return res.json(data);})
+      .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
