@@ -101,7 +101,7 @@ export class RecordsService {
       }
     }
 
-    const paginate = paginationHelper(page, limit);
+    // const paginate = paginationHelper(page, limit);
     const queryBuilder = this.recordsRepository.createQueryBuilder("records")
       .leftJoin("records.user", "user")
       .leftJoin("user.avatar", "avatar")
@@ -254,7 +254,7 @@ export class RecordsService {
   }
 
   async getAnswersByRecord(id, skip, take, order, user) {
-    // const paginate = paginationHelper(page, limit);
+     //const paginate = paginationHelper(page, limit);
     const findRecord = await this.recordsRepository.findOne({ where: { id } });
     if (!findRecord) {
       throw new NotFoundException();
