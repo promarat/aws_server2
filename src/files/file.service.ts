@@ -7,7 +7,7 @@ import { v4 as uuid } from "uuid";
 import { ConfigService } from "nestjs-config";
 import { isUUID } from "class-validator";
 import { FileTypeEnum } from "../lib/enum";
-import Cloud from "@google-cloud/storage";
+import {Storage} from "@google-cloud/storage";
 
 @Injectable()
 export class FileService {
@@ -26,7 +26,6 @@ export class FileService {
     //   ACL:'public-read'
     // })
     //   .promise();
-    const { Storage } = Cloud;
     const storage = new Storage({
       "keyFilename": "../../google-cloud-key.json"
     });
