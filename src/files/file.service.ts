@@ -9,8 +9,6 @@ import { isUUID } from "class-validator";
 import { FileTypeEnum } from "../lib/enum";
 import Cloud from "@google-cloud/storage";
 
-const { Storage } = Cloud;
-
 @Injectable()
 export class FileService {
   constructor(
@@ -28,7 +26,7 @@ export class FileService {
     //   ACL:'public-read'
     // })
     //   .promise();
-
+    const { Storage } = Cloud;
     const storage = new Storage({
       "keyFilename": "../../google-cloud-key.json"
     });
