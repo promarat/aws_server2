@@ -30,7 +30,7 @@ export class FileService {
       "keyFilename": "../../google-cloud-key.json"
     });
     
-    const bucket = storage.bucket("gcsvocco");
+    const bucket = storage.bucket("us.artifacts.pioneering-tome-342312.appspot.com");
     const uploadResult = async () => {
       const fileHandle = bucket.file(`${uuid()}-${filename}`);
       const [ fileExists ] = await fileHandle.exists();
