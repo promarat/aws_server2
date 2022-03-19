@@ -7,6 +7,9 @@ import { v4 as uuid } from "uuid";
 import { ConfigService } from "nestjs-config";
 import { isUUID } from "class-validator";
 import { FileTypeEnum } from "../lib/enum";
+import Cloud from "@google-cloud/storage";
+
+const { Storage } = Cloud;
 
 @Injectable()
 export class FileService {
@@ -17,19 +20,34 @@ export class FileService {
   }
 
   async uploadFile(dataBuffer: Buffer, filename: string, type: FileTypeEnum) {
-    const s3 = new S3();
-    const uploadResult = await s3.upload({
-      Bucket: this.configService.get("app.aws_public_bucket_name"),
-      Body: dataBuffer,
-      Key: `${uuid()}-${filename}`,
-      ACL:'public-read'
-    })
-      .promise();
+    // const s3 = new S3();
+    // const uploadResult = await s3.upload({
+    //   Bucket: this.configService.get("app.aws_public_bucket_name"),
+    //   Body: dataBuffer,
+    //   Key: `${uuid()}-${filename}`,
+    //   ACL:'public-read'
+    // })
+    //   .promise();
+
+    const storage = new Storage({
+      "keyFilename": "../../google-cloud-key.json"
+    });
+    
+    const bucket = storage.bucket("gcsvocco");
+    const uploadResult = async () => {
+      const fileHandle = bucket.file(`${uuid()}-${filename}`);
+      const [ fileExists ] = await fileHandle.exists();
+      if (fileExists === false) {
+        return fileHandle.save(dataBuffer);
+      }
+      return new Promise((resolve, reject) => resolve(filename));
+    };
+    console.log(uploadResult);
     const generateId = uuid();
     const createFileEntity = new PublicFileEntity();
     createFileEntity.id = generateId;
-    createFileEntity.key = uploadResult.Key;
-    createFileEntity.url = uploadResult.Location;
+    // createFileEntity.key = uploadResult.Key;
+    // createFileEntity.url = uploadResult.Location;
     createFileEntity.type = type;
     createFileEntity.link = `${generateId}`;
     return this.publicFilesRepository.save(createFileEntity);
