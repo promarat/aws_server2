@@ -32,12 +32,14 @@ export class FileService {
     
     const bucket = storage.bucket("us.artifacts.pioneering-tome-342312.appspot.com");
     const uploadResult = async () => {
-      const fileHandle = bucket.file(`${uuid()}-${filename}`);
-      const [ fileExists ] = await fileHandle.exists();
-      if (fileExists === false) {
-        return fileHandle.save(dataBuffer);
-      }
-      return new Promise((resolve, reject) => resolve(filename));
+      const file = bucket.file(`${uuid()}-${filename}`);
+      const stream = file.createWriteStream();
+      stream.on("finish", async () => {
+        return await file.setMetadata({
+          metadata: {media:filename},
+        });
+      });
+      stream.end(dataBuffer);
     };
     console.log(uploadResult);
     const generateId = uuid();
