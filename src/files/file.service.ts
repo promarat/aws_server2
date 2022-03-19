@@ -27,10 +27,10 @@ export class FileService {
     // })
     //   .promise();
     const storage = new Storage({
-      "keyFilename": "../../google-cloud-key.json"
+      keyFilename: "../../google-cloud-key.json"
     });
     
-    const bucket = storage.bucket("us.artifacts.pioneering-tome-342312.appspot.com");
+    const bucket = storage.bucket("voccogcs");
     const uploadResult = async () => {
       const file = bucket.file(`${uuid()}-${filename}`);
       const stream = file.createWriteStream();
