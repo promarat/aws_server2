@@ -18,35 +18,35 @@ export class FileService {
   }
 
   async uploadFile(dataBuffer: Buffer, filename: string, type: FileTypeEnum) {
-    // const s3 = new S3();
-    // const uploadResult = await s3.upload({
-    //   Bucket: this.configService.get("app.aws_public_bucket_name"),
-    //   Body: dataBuffer,
-    //   Key: `${uuid()}-${filename}`,
-    //   ACL:'public-read'
-    // })
-    //   .promise();
-    const storage = new Storage({
-      keyFilename: "../../google-cloud-key.json"
-    });
+    const s3 = new S3();
+    const uploadResult = await s3.upload({
+      Bucket: this.configService.get("app.aws_public_bucket_name"),
+      Body: dataBuffer,
+      Key: `${uuid()}-${filename}`,
+      ACL:'public-read'
+    })
+      .promise();
+    // const storage = new Storage({
+    //   keyFilename: "../../google-cloud-key.json"
+    // });
     
-    const bucket = storage.bucket("voccogcs");
-    const uploadResult = async () => {
-      const file = bucket.file(`${uuid()}-${filename}`);
-      const stream = file.createWriteStream();
-      stream.on("finish", async () => {
-        return await file.setMetadata({
-          metadata: {media:filename},
-        });
-      });
-      stream.end(dataBuffer);
-    };
-    console.log(uploadResult);
+    // const bucket = storage.bucket("voccogcs");
+    // const uploadResult = async () => {
+    //   const file = bucket.file(`${uuid()}-${filename}`);
+    //   const stream = file.createWriteStream();
+    //   stream.on("finish", async () => {
+    //     return await file.setMetadata({
+    //       metadata: {media:filename},
+    //     });
+    //   });
+    //   stream.end(dataBuffer);
+    // };
+    // console.log(uploadResult);
     const generateId = uuid();
     const createFileEntity = new PublicFileEntity();
     createFileEntity.id = generateId;
-    // createFileEntity.key = uploadResult.Key;
-    // createFileEntity.url = uploadResult.Location;
+    createFileEntity.key = uploadResult.Key;
+    createFileEntity.url = uploadResult.Location;
     createFileEntity.type = type;
     createFileEntity.link = `${generateId}`;
     return this.publicFilesRepository.save(createFileEntity);
