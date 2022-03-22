@@ -30,7 +30,7 @@ export class FileService {
       keyFilename: "./google-cloud-key.json"
     });
     
-    const bucket = storage.bucket("vocco-storage-0");
+    const bucket = storage.bucket("vocco-2022-s");
     const fname = `${uuid()}-${filename}`;
     const file = bucket.file(fname);
     const stream = file.createWriteStream();
