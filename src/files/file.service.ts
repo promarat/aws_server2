@@ -32,17 +32,14 @@ export class FileService {
     
     const bucket = storage.bucket("vocco-storage-0");
     const fname = `${uuid()}-${filename}`;
-    const uploadResult = async () => {
-      const file = bucket.file(fname);
-      const stream = file.createWriteStream();
-      stream.on("finish", async () => {
-        return await file.setMetadata({
-          metadata: {media:fname},
-        });
+    const file = bucket.file(fname);
+    const stream = file.createWriteStream();
+    stream.on("finish", async () => {
+      return await file.setMetadata({
+        metadata: {media:fname},
       });
-      stream.end(dataBuffer);
-    };
-    console.log(uploadResult);
+    });
+    stream.end(dataBuffer);
     const generateId = uuid();
     const createFileEntity = new PublicFileEntity();
     createFileEntity.id = generateId;
