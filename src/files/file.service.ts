@@ -27,7 +27,7 @@ export class FileService {
     // })
     //   .promise();
     const storage = new Storage({
-      keyFilename: "../../google-cloud-key.json"
+      keyFilename: "./google-cloud-key.json"
     });
     
     const bucket = storage.bucket("vocco-storage-0");
