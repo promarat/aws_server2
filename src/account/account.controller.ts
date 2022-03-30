@@ -103,7 +103,7 @@ export class AccountController {
   @ApiCreatedResponse({ status: HttpStatus.CREATED, type: FileResponse, description: "The file has been uploaded" })
   @ApiUnauthorizedResponse()
   @ApiOperation({ description: "field name: \"file\" | max item size: 4mb | file extension: jpg|jpeg|png" })
-  @UseInterceptors(FileInterceptor("file"))
+  @UseInterceptors(FileInterceptor("file",{limits:{fieldSize:2000000}}))
   async addAvatar(
     @Req() req,
     @Res() res,
