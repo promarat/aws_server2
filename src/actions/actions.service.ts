@@ -41,11 +41,6 @@ export class ActionsService {
       throw new NotFoundException("record not found");
     }
 
-    if (findRecord.user.id != user.id) {
-      const touser = await this.usersRepository.findOne({ where: { id: findRecord.user.id } });
-      this.notificationService.sendNotification(user, touser, findRecord, null, null, NotificationTypeEnum.NEW_ANSWER);
-    }
-
     const uploadFile = await this.filesService.uploadFile(buffer, filename, FileTypeEnum.AUDIO);
     const entity = new AnswersEntity();
     entity.record = findRecord;
@@ -54,6 +49,12 @@ export class ActionsService {
     entity.createdAt = new Date();
     entity.user = user;
     entity.emoji = emoji;
+
+    if (findRecord.user.id != user.id) {
+      const touser = await this.usersRepository.findOne({ where: { id: findRecord.user.id } });
+      this.notificationService.sendNotification(user, touser, findRecord, entity, null, NotificationTypeEnum.NEW_ANSWER);
+    }
+
     return this.answersRepository.save(entity);
   }
 

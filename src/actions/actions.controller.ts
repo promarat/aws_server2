@@ -188,7 +188,6 @@ export class ActionsController {
     @Res() res,
     @Query("id") id: string
   ) {
-    console.log("delete record--", id);
     const user = req.user;
     return this.actionsService.removeRecord(user.id, id)
       .then((data) => res.json(data))

@@ -54,6 +54,7 @@ export class RecordsController {
   @ApiQuery({ name: 'skip', required: true, type: Number, example: 1})
   @ApiQuery({ name: 'take', required: true, type: Number, example: 10})
   @ApiQuery({ name: 'order', required: true, enum: Order})
+  @ApiQuery({ name: 'answerId', type: String})
   @Get("answers")
   getAnswersByRecord(
     @Req() req,
@@ -61,10 +62,11 @@ export class RecordsController {
     @Query('id') id: string,
     @Query('skip') skip: number,
     @Query('take') take: number,
-    @Query('order') order: Order
+    @Query('order') order: Order,
+    @Query('answerId') answerId: string,
   ) {
     const user = req.user;
-    return this.recordsService.getAnswersByRecord(id, skip, take, order, user)
+    return this.recordsService.getAnswersByRecord(id, skip, take, order, user, answerId)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -104,6 +106,7 @@ export class RecordsController {
   @ApiQuery({ name: 'order', required: true, enum: Order})
   @ApiQuery({ name: 'category', type: String})
   @ApiQuery({ name: 'search', type: String})
+  @ApiQuery({ name: 'recordId', type: String})
   @Get("discover")
   allRecords(
     @Req() req,
@@ -113,11 +116,11 @@ export class RecordsController {
     @Query('order') order: Order,
     @Query('category') category: string,
     @Query('search') search: string,
+    @Query('recordId') recordId: string,
   ) {
-    console.log("world-- ", skip, take, order, category, search);
     const { id } = req.user;
-    return this.recordsService.getRecordsByUser(id, skip, take, order, "", category, search)
-      .then((data) => res.json(data))
+    return this.recordsService.getRecordsByUser(id, skip, take, order, "", category, search, recordId)
+      .then((data) => {res.json(data);})
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
@@ -138,7 +141,6 @@ export class RecordsController {
     @Query('category') category: string,
     @Query('search') search: string,
   ) {
-    console.log("world-- ", skip, take, order, category, search);
     const { id } = req.user;
     return this.recordsService.getRecordstitle(id, skip, take, order, category, search)
       .then((data) => res.json(data))
@@ -158,7 +160,6 @@ export class RecordsController {
     @Query('take') take: number,
     @Query('order') order: Order
   ) {
-    console.log("list-- ", skip, take);
     const user = req.user;
     return this.recordsService.getRecordsByUser(user.id, skip, take, order)
       .then((data) => res.json(data))

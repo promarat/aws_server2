@@ -28,7 +28,7 @@ export class NotificationsController {
     @Query('order') order: Order,
     @Query('type') type: string
   ) {
-    const user = req.user; console.log(user);
+    const user = req.user;
     return this.notificationsService.getNotificationsByUser(skip, take, order, type, user)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));

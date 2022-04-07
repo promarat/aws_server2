@@ -57,13 +57,11 @@ export class GoogleAuthenticationService {
     }
 
     const response = await this.authservice.login(null, "", user);
-    console.log("handleRegisteredUser---", response);
     return response;
   }
 
   async registerUser(token: string, email: string) {
     const userData = await this.getUserData(token);
-    console.log("userData--", userData);
     const name = userData.name;
     const user = await this.authservice.registerWithGoogle(email, name);
 
@@ -72,7 +70,6 @@ export class GoogleAuthenticationService {
 
   async authenticate(token: string) {
     const tokenInfo = await this.oauthClient.getTokenInfo(token);
-    console.log("tokenInfo--", tokenInfo);
     const email = tokenInfo.email;
     if (!tokenInfo.email_verified) {
         throw new BadRequestException("Email is Not Verified");

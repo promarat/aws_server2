@@ -42,7 +42,6 @@ export class AccountService {
     findUser.firstname = body.first;
     findUser.lastname = body.last;
     findUser.isPrivate = body.isPrivate == "true" ? true : false;
-    console.log(findUser);
     return this.usersService.completeRegister(findUser);
   }
 
@@ -109,7 +108,7 @@ export class AccountService {
   }
 
   async usernameVerify(user, username) {
-    const findUser = await this.usersService.findByName(user.id, username);console.log(findUser);
+    const findUser = await this.usersService.findByName(user.id, username);
     if (findUser && findUser.length > 0) {
       throw new BadRequestException("username is already taken");
     }

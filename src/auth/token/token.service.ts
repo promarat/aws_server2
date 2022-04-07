@@ -33,7 +33,6 @@ export class TokenService {
     try {
       // const token = await this.tokenRepository.findOne({ where: { value: reqRefreshToken, ipAddress: ipAddress } });
       const token = await this.tokenRepository.findOne({ where: { value: reqRefreshToken } });
-      console.log("getAccessTokenFromRefreshToken token", token);
       const currentDate = new Date();
       if (!token) {
         throw new NotFoundException("Refresh token not found");
@@ -42,7 +41,7 @@ export class TokenService {
         await this.deleteRefreshToken(token.userId, token.value)
         throw new UnauthorizedException('Refresh token expired');
       }
-      const oldPayload = await this.validateToken(oldAccessToken, true);console.log("oldPayload--", oldPayload);
+      const oldPayload = await this.validateToken(oldAccessToken, true);
       const userData = await this.usersService.findOneByIdForPayload(token.userId);
       const payload = {
         pseudo: userData.pseudo,

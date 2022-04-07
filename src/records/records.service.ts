@@ -80,7 +80,7 @@ export class RecordsService {
     return records;
   }
 
-  async getRecordsByUser(me, skip, take, order, user = "", category = "", search = "") {
+  async getRecordsByUser(me, skip, take, order, user = "", category = "", search = "", recordId = "") {
     // if (user != "" && me != user) {
     //   const { count } = await this.friendsRepository
     //   .createQueryBuilder('friends')
@@ -138,6 +138,10 @@ export class RecordsService {
     if (search != "")
       await queryBuilder.andWhere("records.title ILIKE :titlesearch", {titlesearch: '' + search + '%'})
 
+    if (recordId != "") {
+      await queryBuilder.andWhere({ id: recordId });
+    }
+
     const records = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
       // .offset(paginate.offset)
@@ -152,6 +156,7 @@ export class RecordsService {
     // const likes = recordIds.length ? await this.getRecordLikesById(recordIds) : [];
     const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds, me) : [];
     const recordreactions = recordIds.length ? await this.getReactionsByIds(recordIds) : [];
+
     return records.map((el) => {
       // const findRecordLikes = filter(likes, (obj) => obj.record.id === el.id);console.log("i--like---", findRecordLikes);
       // const findUserLike = find(findRecordLikes, (obj) => obj.user.id === el.user.id);
@@ -253,7 +258,7 @@ export class RecordsService {
       .getMany();
   }
 
-  async getAnswersByRecord(id, skip, take, order, user) {
+  async getAnswersByRecord(id, skip, take, order, user, answerId) {
      //const paginate = paginationHelper(page, limit);
     const findRecord = await this.recordsRepository.findOne({ where: { id } });
     if (!findRecord) {
@@ -281,18 +286,26 @@ export class RecordsService {
         "avatar.link",
         "avatar.url"
       ]);
-    const answers = await queryBuilder
+    const tpQueryBuilder = queryBuilder;
+    let answers = await queryBuilder
       .orderBy("answers.createdAt", order.toUpperCase())
       // .offset(paginate.offset)
       // .limit(paginate.getLimit)
       .skip(skip)
       .take(take)
       .getMany();
+    console.log(answerId);
+    console.log("+++++++++++++++++++++++++++++++++");
+    if (answerId != '') {
+      console.log("----------------------------------");
+      const spAnswer = await tpQueryBuilder.where({ id: answerId }).getOne();
+      answers.unshift(spAnswer);
+    }
     const answerIds = answers.map((el) => el.id);
     const likes = answerIds.length ? await this.getAnswerLikesByIds(answerIds, user.id) : [];
-    return answers.map((el) => {
+    return answers.map((el,index) => {
       const findAnswerLikes = filter(likes, (obj) => obj.answer.id === el.id);
-      // const findUserLike = find(findAnswerLikes, (obj) => obj.user.id === el.user.id);
+       const findUserLike = find(findAnswerLikes, (obj) => obj.user.id === el.user.id);
       return {
         ...el,
         isLiked: findAnswerLikes && findAnswerLikes.length > 0 ? true : false,
@@ -336,8 +349,6 @@ export class RecordsService {
     // if (todayLimit >= this.recordLimit) {
     //   throw new BadRequestException("limit for today is exhausted");
     // }
-
-    console.log(findRecord);
 
     const uploadFile = await this.filesService.uploadFile(buffer, filename, FileTypeEnum.AUDIO);
     const rand = Math.floor(Math.random() * (3));
@@ -399,7 +410,6 @@ export class RecordsService {
       user: findUser,
       isFriend: idFriend
     };
-    console.log("severalcount--", severalcount);
     return severalcount;
   }
 

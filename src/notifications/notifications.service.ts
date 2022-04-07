@@ -58,7 +58,6 @@ export class NotificationsService {
       .skip(skip)
       .take(take)
       .getMany()
-      console.log("notis--", notifications);
     return notifications;
   }
 
@@ -109,7 +108,6 @@ export class NotificationsService {
   }
 
   async getUnreadArticleCount(user) {
-    console.log(user);
     const { count } = await this.notificationRepository
     .createQueryBuilder('notifications')
     .where({ toUser: user.id, seen: false})
@@ -125,7 +123,6 @@ export class NotificationsService {
   }
 
   async getUnreadRequestCount(user) {
-    console.log(user);
     const { count } = await this.notificationRepository
     .createQueryBuilder('notifications')
     .where({ toUser: user.id, seen: false, type: NotificationTypeEnum.FRIEND_REQUEST})

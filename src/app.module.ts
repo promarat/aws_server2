@@ -32,7 +32,6 @@ import { GoogleAuthenticationModule } from './googleAuthentication/googleAuthent
           synchronize: true,
           logging: true
         };
-        console.log(config)
         return config
       },
       inject: [ConfigService],

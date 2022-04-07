@@ -29,9 +29,7 @@ import {
         @Res() res,
         @Body() tokenData: TokenVerificationDto
     ): Promise<LoginResponse> {
-        console.log("googleauth--", tokenData.token);
         const user =  await this.googleAuthenticationService.authenticate(tokenData.token)
-        console.log("googleauth user--", user);
         return await this.authService.login(null, "", user)
         .then((data) => res.json(data))
         .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
