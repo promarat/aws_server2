@@ -119,7 +119,7 @@ export class RecordsController {
     @Query('recordId') recordId: string,
   ) {
     const { id } = req.user;
-    return this.recordsService.getRecordsByUser(id, skip, take, order, "", category, search, recordId)
+    return this.recordsService.getRecordsByUser(id, skip, take, order, false, "", category, search, recordId)
       .then((data) => {res.json(data);})
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -161,7 +161,7 @@ export class RecordsController {
     @Query('order') order: Order
   ) {
     const user = req.user;
-    return this.recordsService.getRecordsByUser(user.id, skip, take, order)
+    return this.recordsService.getRecordsByUser(user.id, skip, take, order, true)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

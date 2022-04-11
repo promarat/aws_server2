@@ -14,6 +14,7 @@ import { FileTypeEnum } from "../lib/enum";
 import { ServeralCountResponse } from "./dto/records.response";
 import { UsersEntity } from "src/entities/users.entity";
 import { ReactionsEntity } from "src/entities/reaction.entity";
+import e from "express";
 
 @Injectable()
 export class RecordsService {
@@ -80,7 +81,7 @@ export class RecordsService {
     return records;
   }
 
-  async getRecordsByUser(me, skip, take, order, user = "", category = "", search = "", recordId = "") {
+  async getRecordsByUser(me, skip, take, order, tem = false, user = "", category = "", search = "", recordId = "") {
     // if (user != "" && me != user) {
     //   const { count } = await this.friendsRepository
     //   .createQueryBuilder('friends')
@@ -113,6 +114,8 @@ export class RecordsService {
         "records.emoji",
         "records.duration",
         "records.colorType",
+        "records.privacy",
+        "records.temporary",
         "records.likesCount",
         "records.reactionsCount",
         "records.createdAt",
@@ -142,25 +145,52 @@ export class RecordsService {
       await queryBuilder.andWhere({ id: recordId });
     }
 
-    const records = await queryBuilder
+    let temQueryBuilder;
+    if(tem==true&& skip==0) temQueryBuilder = queryBuilder.clone();
+
+    await queryBuilder.andWhere({temporary:false});
+
+    const mainRecords = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
       // .offset(paginate.offset)
       // .limit(paginate.getLimit)
       .skip(skip)
       .take(take)
       .getMany();
-    // const usersIds = records.filter((el) => el.user?.id !== userId).map((el) => el.user.id); console.log(usersIds);
-    // const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, userId) : [];
+    const usersIds = mainRecords.filter((el) => el.user?.id !== me).map((el) => el.user.id);
+    const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, me) : [];
+    const Records0 = mainRecords.filter((el)=>{
+      const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
+      return el.user.id == me||el.privacy==false||(findFriend && findFriend.status =='accepted');
+    })
+    let records;
+    if(tem == true && skip == 0){
+      await temQueryBuilder.andWhere({temporary:true});
+      var date = new Date();
+      date.setDate(date.getDate()-1);
+      await temQueryBuilder.andWhere("records.createdAt > :limitTime",{limitTime: date})
+      const temRecords = await temQueryBuilder
+        .orderBy("records.createdAt", order.toUpperCase())
+        .getMany();
+      const usersIds = temRecords.filter((el) => el.user?.id !== me).map((el) => el.user.id);
+      const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, me) : [];
+      const Records1 = temRecords.filter((el)=>{
+        const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
+        return el.user.id == me||(findFriend && findFriend.status =='accepted'); 
+      })
+      records= Records0.concat(Records1);
+    }
+    else
+      records = Records0;
     const recordIds = records.map((el) => el.id);
     // const findAnswers = recordIds.length ? await this.getAnswersByRecordIds(recordIds) : [];
     // const likes = recordIds.length ? await this.getRecordLikesById(recordIds) : [];
     const likes = recordIds.length ? await this.getRecordLikesByIds(recordIds, me) : [];
     const recordreactions = recordIds.length ? await this.getReactionsByIds(recordIds) : [];
-
+    
     return records.map((el) => {
       // const findRecordLikes = filter(likes, (obj) => obj.record.id === el.id);console.log("i--like---", findRecordLikes);
       // const findUserLike = find(findRecordLikes, (obj) => obj.user.id === el.user.id);
-      // const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
       // const filterAnswers = filter(findAnswers, (obj) => obj.record.id === el.id);
       // const findAnswer = find(filterAnswers, (obj) => obj.user.id === el.user.id);
       const findlikes = filter(likes, (obj) => obj.record.id === el.id);
@@ -286,7 +316,7 @@ export class RecordsService {
         "avatar.link",
         "avatar.url"
       ]);
-    const tpQueryBuilder = queryBuilder;
+    const tpQueryBuilder = queryBuilder.clone();
     let answers = await queryBuilder
       .orderBy("answers.createdAt", order.toUpperCase())
       // .offset(paginate.offset)
@@ -294,10 +324,7 @@ export class RecordsService {
       .skip(skip)
       .take(take)
       .getMany();
-    console.log(answerId);
-    console.log("+++++++++++++++++++++++++++++++++");
     if (answerId != '') {
-      console.log("----------------------------------");
       const spAnswer = await tpQueryBuilder.where({ id: answerId }).getOne();
       answers.unshift(spAnswer);
     }
@@ -332,6 +359,7 @@ export class RecordsService {
     entity.user = findUser;
     entity.colorType = rand;
     entity.privacy = body.privacy;
+    entity.temporary = body.temporary;
     entity.category = body.category;
 
     return this.recordsRepository.save(entity);

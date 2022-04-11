@@ -126,10 +126,10 @@ export class UsersEntity {
   reactions: ReactionsEntity[];
 
   @OneToMany(type => FriendsEntity, from => from.user)
-  from: FriendsEntity;
+  from: FriendsEntity[];
 
   @OneToMany(type => FriendsEntity, to => to.user)
-  to: FriendsEntity;
+  to: FriendsEntity[];
 
   @OneToMany(type => NotificationsEntity, notificationsTo => notificationsTo.toUser)
   notificationsTo: NotificationsEntity;

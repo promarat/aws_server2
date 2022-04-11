@@ -39,6 +39,9 @@ export class RecordsEntity {
   @Column({ type: "boolean", default: false })
   privacy: boolean;
 
+  @Column({ type: "boolean", default: false })
+  temporary: boolean;
+
   @Column({ nullable: true , default: 0})
   likesCount: number
 

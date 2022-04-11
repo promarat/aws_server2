@@ -18,6 +18,9 @@ export class RecordDto {
   @ApiModelProperty({ example: false })
   privacy: boolean;
 
+  @ApiModelProperty({ example: false })
+  temporary: boolean;
+
   @ApiModelProperty({ type: 'string', format: 'binary', required: true })
   file: any;
 

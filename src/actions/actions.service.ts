@@ -289,7 +289,7 @@ export class ActionsService {
 
   async followFriend(user, friendId) {
     if (user.id == friendId) {
-      throw new BadRequestException("nolja??");
+      throw new BadRequestException("error");
     }
 
     const findFriend = await this.usersRepository.findOne({ where: { id: friendId } });
