@@ -81,7 +81,7 @@ export class RecordsService {
     return records;
   }
 
-  async getRecordsByUser(me, skip, take, order, tem = false, user = "", category = "", search = "", recordId = "") {
+  async getRecordsByUser(me, skip, take, order, user = "", tem = false, category = "", search = "", recordId = "") {
     // if (user != "" && me != user) {
     //   const { count } = await this.friendsRepository
     //   .createQueryBuilder('friends')
@@ -148,7 +148,7 @@ export class RecordsService {
     let temQueryBuilder;
     if(tem==true&& skip==0) temQueryBuilder = queryBuilder.clone();
 
-    await queryBuilder.andWhere({temporary:false});
+    if(search == "") await queryBuilder.andWhere({temporary:false});
 
     const mainRecords = await queryBuilder
       .orderBy("records.createdAt", order.toUpperCase())
@@ -161,6 +161,8 @@ export class RecordsService {
     const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, me) : [];
     const Records0 = mainRecords.filter((el)=>{
       const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
+      if( findFriend && findFriend.status == 'blocked')
+        return false;
       return el.user.id == me||el.privacy==false||(findFriend && findFriend.status =='accepted');
     })
     let records;
@@ -176,6 +178,8 @@ export class RecordsService {
       const findFriends = usersIds.length ? await this.findFriendsByIds(usersIds, me) : [];
       const Records1 = temRecords.filter((el)=>{
         const findFriend = find(findFriends, (obj) => obj.friend.id === el.user.id);
+        if( findFriend && findFriend.status == 'blocked')
+          return false;
         return el.user.id == me||(findFriend && findFriend.status =='accepted'); 
       })
       records= Records0.concat(Records1);
@@ -331,11 +335,10 @@ export class RecordsService {
     const answerIds = answers.map((el) => el.id);
     const likes = answerIds.length ? await this.getAnswerLikesByIds(answerIds, user.id) : [];
     return answers.map((el,index) => {
-      const findAnswerLikes = filter(likes, (obj) => obj.answer.id === el.id);
-       const findUserLike = find(findAnswerLikes, (obj) => obj.user.id === el.user.id);
+      const findUserLike = find(likes, (obj) => (obj.answer.id === el.id&&obj.user.id === el.user.id));
       return {
         ...el,
-        isLiked: findAnswerLikes && findAnswerLikes.length > 0 ? true : false,
+        isLiked: findUserLike ? true : false,
         isMine: el.user.id === user.id
       };
     });

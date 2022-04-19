@@ -16,9 +16,10 @@ export enum PremiumEnum {
 }
 
 export enum FriendsStatusEnum {
+  NONE = 'none',
   ACCEPTED = 'accepted',
   PENDING = 'pending',
-  CANCELED = 'canceled',
+  BLOCKED = 'blocked',
 }
 
 export enum NotificationTypeEnum {
@@ -28,6 +29,7 @@ export enum NotificationTypeEnum {
   FRIEND_REQUEST = 'friendRequest',
   FRIEND_ACCEPT = 'friendAccept',
   FRIEND_DELETE = 'friendDelete',
+  USER_BLOCK = 'userBlock',
 }
 
 export enum FileTypeEnum {

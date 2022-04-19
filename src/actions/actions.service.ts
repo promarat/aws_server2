@@ -282,9 +282,9 @@ export class ActionsService {
     if (!existFriend) {
       throw new BadRequestException("user not you friend");
     }
-
+    existFriend.status = FriendsStatusEnum.NONE;
     this.notificationService.sendNotification(user, findFriend, null, null, null, NotificationTypeEnum.FRIEND_DELETE);
-    return this.friendsRepository.delete(existFriend.id);
+    return this.friendsRepository.save(existFriend);
   }
 
   async followFriend(user, friendId) {
@@ -306,6 +306,43 @@ export class ActionsService {
     entity.status = FriendsStatusEnum.PENDING; //todo add notification service
     const savedentity = await this.friendsRepository.save(entity);
     this.notificationService.sendNotification(user, findFriend, null, null, savedentity, NotificationTypeEnum.FRIEND_REQUEST);
+    return savedentity;
+  }
+  async blockUser(user, friendId) {
+    if (user.id == friendId) {
+      throw new BadRequestException("error");
+    }
+
+    const findFriend = await this.usersRepository.findOne({ where: { id: friendId } });
+    if (!findFriend) {
+      throw new NotFoundException();
+    }
+    const existFriend = await this.friendsRepository.findOne({ where: { user: user.id, friend: friendId } });
+    let savedentity;
+    if (existFriend) {
+      existFriend.status = FriendsStatusEnum.BLOCKED;
+      savedentity = await this.friendsRepository.save(existFriend);
+    }
+    else{
+      const entity = new FriendsEntity();
+      entity.user = user.id;
+      entity.friend = findFriend;
+      entity.status = FriendsStatusEnum.BLOCKED; //todo add notification service
+      savedentity = await this.friendsRepository.save(entity);
+    }
+    const reverse = await this.friendsRepository.findOne({ where: { user: friendId, friend: user.id } });
+    if (reverse) {
+      existFriend.status = FriendsStatusEnum.BLOCKED;
+      await this.friendsRepository.save(existFriend);
+    }
+    else{
+      const entity = new FriendsEntity();
+      entity.user = findFriend;
+      entity.friend = user.id;
+      entity.status = FriendsStatusEnum.BLOCKED; //todo add notification service
+      await this.friendsRepository.save(entity);
+    }
+    this.notificationService.sendNotification(user, findFriend, null, null, savedentity, NotificationTypeEnum.USER_BLOCK);
     return savedentity;
   }
   

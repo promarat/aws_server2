@@ -172,6 +172,19 @@ export class ActionsController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Post("block")
+  @ApiParam({ name: "userid", required: true, type: String })
+  async blockUser(
+    @Req() req,
+    @Res() res,
+    @Query("userid") id: string
+  ) {
+    const user = req.user;
+    return this.actionsService.blockUser(user, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
   @Get("countries")
   async getAllCountries(
     @Res() res
