@@ -22,7 +22,7 @@ export class MailService {
             .sendMail({
                 to: email,
                 from: this.configService.get('app.smtp_mail'),
-                subject: 'Welcome to Raise Your Voice! Confirm your Email',
+                subject: 'Welcome to Vocco! Confirm your Email',
                 template: './index', // './' bugfix, undocumented in docs
                 context: {code},
             })
@@ -40,7 +40,7 @@ export class MailService {
             .sendMail({
                 to: email,
                 from: this.configService.get('app.smtp_mail'),
-                subject: 'Welcome to Raise Your Voice! Confirm your Email',
+                subject: 'Hi.',
                 template: './notice', // './' bugfix, undocumented in docs
                 context: {username, description},
             })
@@ -59,7 +59,7 @@ export class MailService {
             .sendMail({
                 to: email,
                 from: this.configService.get('app.smtp_mail'),
-                subject: 'Hello',
+                subject: 'Hi',
                 template: './notice', // './' bugfix, undocumented in docs
                 context: {username, description},
             })
@@ -79,7 +79,7 @@ export class MailService {
             .sendMail({
                 to: email,
                 from: this.configService.get('app.smtp_mail'),
-                subject: 'Hello',
+                subject: 'Hi',
                 template: './notice', // './' bugfix, undocumented in docs
                 context: {username, description},
             })
@@ -100,7 +100,7 @@ export class MailService {
             .sendMail({
                 to: email,
                 from: this.configService.get('app.smtp_mail'),
-                subject: 'Hello',
+                subject: 'Hi',
                 template: './notice', // './' bugfix, undocumented in docs
                 context: {username, description},
             })
@@ -120,7 +120,7 @@ export class MailService {
             .sendMail({
                 to: email,
                 from: this.configService.get('app.smtp_mail'),
-                subject: 'HI',
+                subject: 'Hi',
                 template: './index', // './' bugfix, undocumented in docs
                 context: {code},
             })
