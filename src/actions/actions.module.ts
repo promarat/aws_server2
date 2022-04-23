@@ -16,6 +16,9 @@ import { NotificationsEntity } from '../entities/notification.entity';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { ReportsEntity } from 'src/entities/reports.entity';
 import { ReactionsEntity } from 'src/entities/reaction.entity';
+import { MailService } from '../mail/mail.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports: [
@@ -33,7 +36,7 @@ import { ReactionsEntity } from 'src/entities/reaction.entity';
       ]),
       NotificationsModule
   ],
-  providers: [ActionsService, FileService],
+  providers: [ActionsService, FileService , UsersService, RecordsService, MailService],
   controllers: [ActionsController]
 })
 export class ActionsModule {}

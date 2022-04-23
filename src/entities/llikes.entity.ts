@@ -20,6 +20,9 @@ export class LikesEntity {
   @Column({default: null})
   emoji: string;
 
+  @Column({default: true})
+  isLike: boolean;
+
   @ManyToOne(() => UsersEntity, (user) => user.likes, {
     nullable: false,
     onDelete: "CASCADE"

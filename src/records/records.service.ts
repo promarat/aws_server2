@@ -6,6 +6,7 @@ import { FileService } from "../files/file.service";
 import { UsersService } from "../users/users.service";
 import { RecordDto } from "./dto/record.dto";
 import { AnswersEntity } from "../entities/answers.entity";
+import { MailService } from "../mail/mail.service";
 import { paginationHelper } from "../lib/helpers";
 import { LikesEntity } from "../entities/llikes.entity";
 import { filter, find } from "lodash";
@@ -20,6 +21,7 @@ import e from "express";
 export class RecordsService {
   private readonly recordLimit: number;
   constructor(
+  //  private readonly mailService:  MailService,
     @InjectRepository(RecordsEntity) private recordsRepository: Repository<RecordsEntity>,
     @InjectRepository(UsersEntity) private usersRepository: Repository<UsersEntity>,
     @InjectRepository(AnswersEntity) private answersRepository: Repository<AnswersEntity>,
@@ -27,7 +29,7 @@ export class RecordsService {
     @InjectRepository(ReactionsEntity) private reactionsRepository: Repository<ReactionsEntity>,
     @InjectRepository(FriendsEntity) private friendsRepository: Repository<FriendsEntity>,
     private readonly filesService: FileService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
   ) {
     this.recordLimit = 5;
   }
@@ -249,6 +251,20 @@ export class RecordsService {
       .getMany();
   }
 
+  findUsersByFriendId(friendId) {
+    return this.friendsRepository
+      .createQueryBuilder("friends")
+      .where({ friend: friendId })
+      .innerJoin("friends.user", "user")
+      .select([
+        "friends.id",
+        "friends.status",
+        "user.id",
+        "user.email"
+      ])
+      .getMany();
+  }
+
   getRecordLikesById(ids): Promise<LikesEntity[]> {
     return this.likesRepository
       .createQueryBuilder("likes")
@@ -376,6 +392,8 @@ export class RecordsService {
     entity.privacy = body.privacy;
     entity.temporary = body.temporary;
     entity.category = body.category;
+
+   // this.mailService.sentNotifyToFriends(user.id,findUser.name,'Discover the new story of ');
 
     return this.recordsRepository.save(entity);
   }

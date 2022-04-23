@@ -5,6 +5,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { UsersEntity } from "../entities/users.entity";
 import { RefreshTokenEntity } from "../entities/token.entity";
 import { PublicFileEntity } from "../entities/public-file.entity";
+import { RecordsEntity } from "src/entities/records.entity";
+import { AnswersEntity } from "src/entities/answers.entity";
 
 @Module({
   imports: [
@@ -12,7 +14,9 @@ import { PublicFileEntity } from "../entities/public-file.entity";
       [
         UsersEntity,
         RefreshTokenEntity,
-        PublicFileEntity
+        PublicFileEntity,
+        RecordsEntity,
+        AnswersEntity
       ])
   ],
   providers: [UsersService],

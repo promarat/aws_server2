@@ -5,6 +5,7 @@ import { Repository, getConnection } from "typeorm";
 import { LikesEntity, LikeTypeEnum } from "../entities/llikes.entity";
 import { RecordsEntity } from "../entities/records.entity";
 import { FileService } from "../files/file.service";
+import { MailService } from "../mail/mail.service";
 import { UsersEntity } from "../entities/users.entity";
 import { FriendsEntity } from "../entities/friends.entity";
 import { FileTypeEnum, FriendsStatusEnum, NotificationTypeEnum } from "../lib/enum";
@@ -26,7 +27,8 @@ export class ActionsService {
     @InjectRepository(CountryEntity) private countriesRepository: Repository<CountryEntity>,
     @InjectRepository(ReportsEntity) private reportsRepository: Repository<ReportsEntity>,
     private readonly filesService: FileService,
-    private readonly notificationService: NotificationsService
+    private readonly notificationService: NotificationsService,
+    private  mailService: MailService,
   ) {
   }
 
@@ -34,7 +36,7 @@ export class ActionsService {
     const findRecord = await this.recordsRepository.createQueryBuilder("record")
       .leftJoin('record.user', 'user')
       .where({ id: record })
-      .select(["record.id", "user.id"])
+      .select(["record.id", "user.id", "user.email"])
       .getOne();
 
     if (!findRecord) {
@@ -53,6 +55,7 @@ export class ActionsService {
     if (findRecord.user.id != user.id) {
       const touser = await this.usersRepository.findOne({ where: { id: findRecord.user.id } });
       this.notificationService.sendNotification(user, touser, findRecord, entity, null, NotificationTypeEnum.NEW_ANSWER);
+      this.mailService.sentNotify(findRecord.user.email,'Someone answered you!','');
     }
 
     return this.answersRepository.save(entity);
@@ -62,7 +65,7 @@ export class ActionsService {
     const record = await this.recordsRepository.createQueryBuilder("record")
       .leftJoin('record.user', 'user')
       .where({ id: recordId })
-      .select(["record.id", "record.likesCount", "user.id"])
+      .select(["record.id", "record.likesCount", "user.id", "user.email"])
       .getOne();
     if (!record) {
       throw new NotFoundException();
@@ -71,7 +74,8 @@ export class ActionsService {
     const existingLike = await this.likesRepository.findOne({
         where: {
           user: user.id,
-          record: recordId
+          record: recordId,
+          isLike: true,
         }
       }
     );
@@ -84,20 +88,37 @@ export class ActionsService {
       this.notificationService.sendNotification(user, touser, record, null, null, NotificationTypeEnum.LIKE_RECORD);
     }
 
-    const like = new LikesEntity();
-    like.user = await this.usersRepository.findOne({ where: { id: user.id } });
-    like.record = record;
-    like.type = LikeTypeEnum.RECORD;
-    like.emoji = ""; // body.emoji;
     getConnection().createQueryBuilder().update("records").set({ likesCount : record.likesCount + 1 }).where({ id: record.id}).execute();
 
-    await this.likesRepository
-      .createQueryBuilder()
-      .insert()
-      .into(LikesEntity)
-      .values(like)
-      .execute();
-    return like;
+    const existing = await this.likesRepository.findOne({
+        where: {
+          user: user.id,
+          record: recordId,
+        }
+      }
+    );
+
+    if(!existing){
+      this.mailService.sentNotify(record.user.email,'Your vocal is popular!','');
+      if(record.likesCount + 1== 50){
+        this.mailService.sentNotifyToUsers('','Here is a story that might interest you 👀');
+      }
+      const like = new LikesEntity();
+      like.user = await this.usersRepository.findOne({ where: { id: user.id } });
+      like.record = record;
+      like.type = LikeTypeEnum.RECORD;
+      like.emoji = ""; // body.emoji;
+      await this.likesRepository
+        .createQueryBuilder()
+        .insert()
+        .into(LikesEntity)
+        .values(like)
+        .execute();
+      return like;
+    }
+    else{
+      return this.likesRepository.update(existing.id,{isLike:true});
+    }
   }
 
   async reactionRecord(user, recordId: string, body) {
@@ -174,23 +195,20 @@ export class ActionsService {
     .where({ id: answerId })
     .select(["answer.id", "answer.likesCount", "user.id"])
     .getOne();
-    console.log("++++++++++++++");
-    console.log(answer);
     if (!answer) {
       throw new NotFoundException("answer not found");
     }
-    console.log("00000000000000000000000000000000000000000");
     const existingLike = await this.likesRepository.findOne({
         where: {
           user: user.id,
-          answer: answerId
+          answer: answerId,
+          isLike: true,
         }
       }
     );
     if (existingLike) {
       throw new BadRequestException("already appreciate");
     }
-    console.log("11111111111111111111111111111111111111");
     if (answer.user.id != user.id) {
       const touser = await this.usersRepository.findOne({ where: { id: answer.user.id } });
       this.notificationService.sendNotification(user, touser, null, answer, null, NotificationTypeEnum.LIKE_ANSWER);
@@ -203,15 +221,25 @@ export class ActionsService {
     
     getConnection().createQueryBuilder().update("answers").set({ likesCount : answer.likesCount + 1 }).where({ id: answer.id}).execute();
 
-    console.log("222222222222222222222222222222222222");
-
-    await this.likesRepository
-      .createQueryBuilder()
-      .insert()
-      .into(LikesEntity)
-      .values(like)
-      .execute();
-    return like;
+    const existing = await this.likesRepository.findOne({
+        where: {
+          user: user.id,
+          answer: answerId,
+        }
+      }
+    );
+    if (existingLike) {
+      return this.likesRepository.update(existing.id,{isLike:true});
+    }
+    else{
+      await this.likesRepository
+        .createQueryBuilder()
+        .insert()
+        .into(LikesEntity)
+        .values(like)
+        .execute();
+      return like;
+    }
   }
 
   async unLikeRecord(userId: string, recordId: string) {
@@ -223,7 +251,8 @@ export class ActionsService {
     const existingLike = await this.likesRepository.findOne({
         where: {
           user: userId,
-          record: recordId
+          record: recordId,
+          isLike: true,
         }
       }
     );
@@ -231,7 +260,7 @@ export class ActionsService {
       throw new BadRequestException("like not found");
     }
     await this.recordsRepository.update(record.id, { likesCount: record.likesCount - 1 });
-    return this.likesRepository.delete(existingLike.id);
+    return this.likesRepository.update(existingLike.id,{isLike:false});
   }
 
   async unLikeAnswer(userId: string, answerId: string) {
@@ -243,7 +272,8 @@ export class ActionsService {
     const existingLike = await this.likesRepository.findOne({
         where: {
           user: userId,
-          answer: answerId
+          answer: answerId,
+          isLike: true,
         }
       }
     );
@@ -251,7 +281,7 @@ export class ActionsService {
       throw new BadRequestException("like not found");
     }
     await this.answersRepository.update(answer.id, { likesCount: answer.likesCount - 1 });
-    return this.likesRepository.delete(existingLike.id);
+    return this.likesRepository.update(existingLike.id, { isLike:false});
   }
 
   async acceptFriend(user, friendId) {
@@ -274,6 +304,7 @@ export class ActionsService {
     // entity.status = FriendsStatusEnum.ACCEPTED; //todo add notification service
     existFriend.status = FriendsStatusEnum.ACCEPTED; //todo add notification service
     this.notificationService.sendNotification(user, findFriend, null, null, null, NotificationTypeEnum.FRIEND_ACCEPT);
+    this.mailService.sentNotify(findFriend.email,'has accepted your friend request ✨',findFriend.name,)
     return this.friendsRepository.save(existFriend);
   }
 
@@ -305,6 +336,7 @@ export class ActionsService {
     if (existFriend) {
       existFriend.status = FriendsStatusEnum.PENDING;
       savedentity = await this.friendsRepository.save(existFriend)
+      this.mailService.sentNotify(findFriend.email,'wants to be your friend 🤩',findFriend.name,);
     }
     else{
       const entity = new FriendsEntity();

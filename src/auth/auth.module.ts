@@ -52,11 +52,11 @@ import { FriendsEntity } from "src/entities/friends.entity";
     LocalStrategy,
     JwtStrategy,
     UsersService,
-    FileService,
     MailService,
+    FileService,
     TokenService,
+    RecordsService,
     SubScribeService,
-    RecordsService
   ],
   controllers: [AuthController],
   exports: [AuthService]

@@ -15,9 +15,8 @@ export class AuthService {
     private usersService: UsersService,
     private tokenService: TokenService,
     private mailService: MailService,
-
     @InjectRepository(PasswordResetEntity) private passwordResetRepository: Repository<PasswordResetEntity>
-  ) {
+  ){
   }
 
   async register(credentials, ip) {

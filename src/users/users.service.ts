@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UsersEntity } from "../entities/users.entity";
+import { RecordsEntity } from "src/entities/records.entity";
+import { AnswersEntity } from "src/entities/answers.entity";
 import { Repository, Not, MoreThan } from "typeorm";
 import { GeneratorUtil } from "../lib/generator-util";
 import { maxLength } from "class-validator";
@@ -9,6 +11,8 @@ import { maxLength } from "class-validator";
 export class UsersService {
   constructor(
     @InjectRepository(UsersEntity) private usersRepository: Repository<UsersEntity>,
+    @InjectRepository(RecordsEntity) private recordsRepository: Repository<RecordsEntity>,
+    @InjectRepository(AnswersEntity) private answersRepository: Repository<AnswersEntity>,
   ) {
   }
 
@@ -78,6 +82,24 @@ export class UsersService {
         "user.id",
       ])
       .getMany()
+  }
+
+  async findEmails(){
+    const users = await this.usersRepository.createQueryBuilder('user')
+      .select(["user.email"])
+      .getMany();
+    return users.map((user) => user.email);
+  }
+
+  async findEmailsWithAnswer(){
+    const answers = await this.answersRepository.createQueryBuilder('answer')
+      .leftJoin("answer.record", "record")
+      .leftJoin("record.user", "user")
+      .loadRelationCountAndMap("records.answersCount", "records.answers", "answers")
+      .select(["user.email"])
+      .getMany();
+    const emails = answers.map((answer) => answer.user.email);
+    return [...new Set(emails)];
   }
 
   createUser(newUser: UsersEntity): Promise<UsersEntity> {

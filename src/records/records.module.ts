@@ -11,6 +11,8 @@ import { AnswersEntity } from "../entities/answers.entity";
 import { LikesEntity } from "../entities/llikes.entity";
 import { FriendsEntity } from "../entities/friends.entity";
 import { ReactionsEntity } from 'src/entities/reaction.entity';
+import { MailService } from '../mail/mail.service';
+import { ActionsService } from 'src/actions/actions.service';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { ReactionsEntity } from 'src/entities/reaction.entity';
         ReactionsEntity
       ])
   ],
-  providers: [RecordsService, FileService, UsersService],
+  providers: [RecordsService, FileService, UsersService , MailService ],
   controllers: [RecordsController]
 })
 export class RecordsModule {}
