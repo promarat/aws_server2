@@ -174,10 +174,12 @@ export class ActionsService {
     .where({ id: answerId })
     .select(["answer.id", "answer.likesCount", "user.id"])
     .getOne();
+    console.log("++++++++++++++");
+    console.log(answer);
     if (!answer) {
       throw new NotFoundException("answer not found");
     }
-
+    console.log("00000000000000000000000000000000000000000");
     const existingLike = await this.likesRepository.findOne({
         where: {
           user: user.id,
@@ -188,7 +190,7 @@ export class ActionsService {
     if (existingLike) {
       throw new BadRequestException("already appreciate");
     }
-
+    console.log("11111111111111111111111111111111111111");
     if (answer.user.id != user.id) {
       const touser = await this.usersRepository.findOne({ where: { id: answer.user.id } });
       this.notificationService.sendNotification(user, touser, null, answer, null, NotificationTypeEnum.LIKE_ANSWER);
@@ -200,6 +202,8 @@ export class ActionsService {
     like.type = LikeTypeEnum.ANSWER;
     
     getConnection().createQueryBuilder().update("answers").set({ likesCount : answer.likesCount + 1 }).where({ id: answer.id}).execute();
+
+    console.log("222222222222222222222222222222222222");
 
     await this.likesRepository
       .createQueryBuilder()
@@ -297,14 +301,18 @@ export class ActionsService {
       throw new NotFoundException();
     }
     const existFriend = await this.friendsRepository.findOne({ where: { user: user.id, friend: friendId } });
+    let savedentity;
     if (existFriend) {
-      throw new BadRequestException("user already followed");
+      existFriend.status = FriendsStatusEnum.PENDING;
+      savedentity = await this.friendsRepository.save(existFriend)
     }
-    const entity = new FriendsEntity();
-    entity.user = user.id;
-    entity.friend = findFriend;
-    entity.status = FriendsStatusEnum.PENDING; //todo add notification service
-    const savedentity = await this.friendsRepository.save(entity);
+    else{
+      const entity = new FriendsEntity();
+      entity.user = user.id;
+      entity.friend = findFriend;
+      entity.status = FriendsStatusEnum.PENDING; //todo add notification service
+      savedentity = await this.friendsRepository.save(entity);
+    }
     this.notificationService.sendNotification(user, findFriend, null, null, savedentity, NotificationTypeEnum.FRIEND_REQUEST);
     return savedentity;
   }

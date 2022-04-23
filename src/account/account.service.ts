@@ -29,6 +29,12 @@ export class AccountService {
     const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
     return { ...userData, ...limitData };
   }
+  
+  async resendCode(user) {
+    const userData =  await this.usersService.findById(user.id);
+    this.mailService.sentVerificationCode(userData.pseudo, userData.email);
+    return true;
+  }
 
   async updateProfile(user: UsersEntity, body: CompleteRegisterDto) {
     const findUser = await this.usersService.findById(user.id);

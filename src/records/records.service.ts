@@ -21,6 +21,7 @@ export class RecordsService {
   private readonly recordLimit: number;
   constructor(
     @InjectRepository(RecordsEntity) private recordsRepository: Repository<RecordsEntity>,
+    @InjectRepository(UsersEntity) private usersRepository: Repository<UsersEntity>,
     @InjectRepository(AnswersEntity) private answersRepository: Repository<AnswersEntity>,
     @InjectRepository(LikesEntity) private likesRepository: Repository<LikesEntity>,
     @InjectRepository(ReactionsEntity) private reactionsRepository: Repository<ReactionsEntity>,
@@ -74,11 +75,22 @@ export class RecordsService {
       .orderBy("records.createdAt", order.toUpperCase())
       // .offset(paginate.offset)
       // .limit(paginate.getLimit)
-      .skip(skip)
-      .take(take)
+      // .skip(skip)
+      // .take(take)
       .getMany();
-
-    return records;
+    const userQueryBuilder = this.usersRepository.createQueryBuilder("users")
+      .leftJoin("users.avatar", "avatar")
+      .select([
+        "users.id",
+        "users.name",
+        "avatar.url"
+      ]);
+    if( search != "")
+      await userQueryBuilder.where("users.name ILIKE :titlesearch", {titlesearch: ''+ search + '%'})
+    const users = await userQueryBuilder
+      .orderBy("users.name")
+      .getMany();
+    return {record:records, user:users};
   }
 
   async getRecordsByUser(me, skip, take, order, user = "", tem = false, category = "", search = "", recordId = "") {
@@ -335,7 +347,7 @@ export class RecordsService {
     const answerIds = answers.map((el) => el.id);
     const likes = answerIds.length ? await this.getAnswerLikesByIds(answerIds, user.id) : [];
     return answers.map((el,index) => {
-      const findUserLike = find(likes, (obj) => (obj.answer.id === el.id&&obj.user.id === el.user.id));
+      const findUserLike = find(likes, (obj) => (obj.answer.id === el.id));
       return {
         ...el,
         isLiked: findUserLike ? true : false,

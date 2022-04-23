@@ -54,6 +54,23 @@ export class AccountController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Get("resendcode")
+  @ApiCreatedResponse({
+    status: HttpStatus.CREATED,
+    type: AccountMeResponse,
+    description: "The file has been uploaded"
+  })
+  @ApiUnauthorizedResponse()
+  async resendCode(
+    @Req() req,
+    @Res() res
+  ) {
+    const user = req.user;
+    return this.accountService.resendCode(user)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
   @Put("completeregister")
   @ApiCreatedResponse({ status: HttpStatus.CREATED, type: UsersResponse, description: "The file has been uploaded" })
   @ApiUnauthorizedResponse()
