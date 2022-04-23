@@ -21,7 +21,7 @@ import e from "express";
 export class RecordsService {
   private readonly recordLimit: number;
   constructor(
-  //  private readonly mailService:  MailService,
+  
     @InjectRepository(RecordsEntity) private recordsRepository: Repository<RecordsEntity>,
     @InjectRepository(UsersEntity) private usersRepository: Repository<UsersEntity>,
     @InjectRepository(AnswersEntity) private answersRepository: Repository<AnswersEntity>,
@@ -30,6 +30,7 @@ export class RecordsService {
     @InjectRepository(FriendsEntity) private friendsRepository: Repository<FriendsEntity>,
     private readonly filesService: FileService,
     private readonly usersService: UsersService,
+    private readonly mailService:  MailService,
   ) {
     this.recordLimit = 5;
   }

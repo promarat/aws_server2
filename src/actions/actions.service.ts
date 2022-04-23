@@ -99,10 +99,6 @@ export class ActionsService {
     );
 
     if(!existing){
-      this.mailService.sentNotify(record.user.email,'Your vocal is popular!','');
-      if(record.likesCount + 1== 50){
-        this.mailService.sentNotifyToUsers('','Here is a story that might interest you 👀');
-      }
       const like = new LikesEntity();
       like.user = await this.usersRepository.findOne({ where: { id: user.id } });
       like.record = record;
@@ -114,6 +110,11 @@ export class ActionsService {
         .into(LikesEntity)
         .values(like)
         .execute();
+      
+      this.mailService.sentNotify(record.user.email,'Your vocal is popular!','');
+      if(record.likesCount + 1== 50){
+        this.mailService.sentNotifyToUsers('','Here is a story that might interest you 👀');
+      }  
       return like;
     }
     else{
@@ -304,7 +305,7 @@ export class ActionsService {
     // entity.status = FriendsStatusEnum.ACCEPTED; //todo add notification service
     existFriend.status = FriendsStatusEnum.ACCEPTED; //todo add notification service
     this.notificationService.sendNotification(user, findFriend, null, null, null, NotificationTypeEnum.FRIEND_ACCEPT);
-    this.mailService.sentNotify(findFriend.email,'has accepted your friend request ✨',findFriend.name,)
+    this.mailService.sentNotify(findFriend.email,'has accepted your friend request ✨',user.name,)
     return this.friendsRepository.save(existFriend);
   }
 
@@ -336,7 +337,6 @@ export class ActionsService {
     if (existFriend) {
       existFriend.status = FriendsStatusEnum.PENDING;
       savedentity = await this.friendsRepository.save(existFriend)
-      this.mailService.sentNotify(findFriend.email,'wants to be your friend 🤩',findFriend.name,);
     }
     else{
       const entity = new FriendsEntity();
@@ -345,6 +345,7 @@ export class ActionsService {
       entity.status = FriendsStatusEnum.PENDING; //todo add notification service
       savedentity = await this.friendsRepository.save(entity);
     }
+    this.mailService.sentNotify(findFriend.email,'wants to be your friend 🤩',findFriend.name,);
     this.notificationService.sendNotification(user, findFriend, null, null, savedentity, NotificationTypeEnum.FRIEND_REQUEST);
     return savedentity;
   }
