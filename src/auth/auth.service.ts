@@ -38,7 +38,7 @@ export class AuthService {
     return this.login(credentials, ip, createUser)
   }
   
-  async registerWithGoogle(email: string, name: string) {
+  async registerWithGoogle(email: string) {
     const existUser = await this.usersService.findOneByEmail(email);
     if (existUser) {
       throw new BadRequestException("User with current email already registered");

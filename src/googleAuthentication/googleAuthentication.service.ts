@@ -2,8 +2,10 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { UsersService } from '../users/users.service';
 import { ConfigService } from 'nestjs-config';
 import { google, Auth } from 'googleapis';
+import applesignin from 'apple-signin-auth'
 import { UsersEntity } from '../entities/users.entity';
 import { AuthService } from '../auth/auth.service'
+import AppleTokenVerificationDto from './dto/appleTokenVerification.dto';
 
 @Injectable()
 export class GoogleAuthenticationService {
@@ -61,9 +63,9 @@ export class GoogleAuthenticationService {
   }
 
   async registerUser(token: string, email: string) {
-    const userData = await this.getUserData(token);
-    const name = userData.name;
-    const user = await this.authservice.registerWithGoogle(email, name);
+    // const userData = await this.getUserData(token);
+    // const name = userData.name;
+    const user = await this.authservice.registerWithGoogle(email);
 
     return user;
   }
@@ -81,6 +83,18 @@ export class GoogleAuthenticationService {
     }
     else{
       return this.registerUser(token, email);
+    }
+  }
+
+  async appleAuthenticate(info: AppleTokenVerificationDto) {
+    const email = info.email;
+
+    const user = await this.usersService.findOneByEmail(email);
+    if (user){
+      return user;
+    }
+    else{
+      return this.registerUser(info.identityToken, email);
     }
   }
 }
