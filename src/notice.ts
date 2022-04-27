@@ -13,12 +13,12 @@ export class TasksService {
   @Cron('* * 18 */2 * *')
   anythingHappen() {
     this.logger.debug('Called at 6 pm every 2 days');
-    this.mailService.sentNotifyToUsers('','Anything happened to you today? Say it!');
+    this.mailService.sentNotifyToUsers('Anything happened to you today? Say it!');
   }
 
   @Cron('* 30 12 * * *')
   answerThem() {
     this.logger.debug('Called at 12.30 pm every day');
-    this.mailService.sentNotifyToUsersHaveAnswer('','You have answer(s), answer them!');
+    this.mailService.sentNotifyToUsersHaveAnswer('You have answers, answer them!');
   }
 }

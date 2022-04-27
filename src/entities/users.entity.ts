@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { PublicFileEntity } from "./public-file.entity";
 import { RecordsEntity } from "./records.entity";
+import { DevicesEntity} from "./device.entity"
 import { AnswersEntity } from "./answers.entity";
 import { LikesEntity } from "./llikes.entity";
 import { GenderEnum } from "../lib/enum";
@@ -115,6 +116,9 @@ export class UsersEntity {
 
   @OneToMany(type => RecordsEntity, records => records.user)
   records: RecordsEntity[];
+
+  @OneToMany(type => DevicesEntity, devices => devices.user)
+  devices: DevicesEntity[];
 
   @OneToMany(type => AnswersEntity, answers => answers.user)
   answers: AnswersEntity[];

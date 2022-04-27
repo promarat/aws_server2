@@ -13,6 +13,7 @@ import { LikesEntity } from "../entities/llikes.entity";
 import { FriendsEntity } from "../entities/friends.entity";
 import { MailService } from "src/mail/mail.service";
 import { ReactionsEntity } from "src/entities/reaction.entity";
+import { DevicesEntity } from "src/entities/device.entity";
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { ReactionsEntity } from "src/entities/reaction.entity";
         AnswersEntity,
         LikesEntity,
         FriendsEntity,
-        ReactionsEntity
+        ReactionsEntity,
+        DevicesEntity
       ])
   ],
   providers: [

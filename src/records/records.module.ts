@@ -13,6 +13,7 @@ import { FriendsEntity } from "../entities/friends.entity";
 import { ReactionsEntity } from 'src/entities/reaction.entity';
 import { MailService } from '../mail/mail.service';
 import { ActionsService } from 'src/actions/actions.service';
+import { DevicesEntity } from 'src/entities/device.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { ActionsService } from 'src/actions/actions.service';
         AnswersEntity,
         LikesEntity,
         FriendsEntity,
-        ReactionsEntity
+        ReactionsEntity,
+        DevicesEntity
       ])
   ],
   providers: [RecordsService, FileService, UsersService , MailService ],

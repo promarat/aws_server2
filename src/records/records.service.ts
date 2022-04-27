@@ -30,7 +30,6 @@ export class RecordsService {
     @InjectRepository(FriendsEntity) private friendsRepository: Repository<FriendsEntity>,
     private readonly filesService: FileService,
     private readonly usersService: UsersService,
-    private readonly mailService:  MailService,
   ) {
     this.recordLimit = 5;
   }

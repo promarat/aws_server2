@@ -23,7 +23,10 @@ export class AccountService {
   ) {
   }
 
-  async getAccountData(user) {
+  async getAccountData(user, checkDevice, deviceToken, deviceOs) {
+    if(checkDevice == true){
+      this.usersService.deviceRegister(user,deviceToken, deviceOs);
+    }
     const userDataQuery = this.usersService.findById(user.id);
     const limitsQuery = this.recordsService.getTodayCount(user);
     const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);

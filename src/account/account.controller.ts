@@ -18,6 +18,7 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags, ApiUnauthorizedResponse, ApiParam
 } from "@nestjs/swagger";
 import { CompleteRegisterDto } from "./dto/complete-register.dto";
@@ -37,6 +38,9 @@ export class AccountController {
   constructor(private accountService: AccountService) {
   }
 
+  @ApiQuery({ name: 'checkDevice', type: Boolean})
+  @ApiQuery({ name: 'deviceToken', type: String})
+  @ApiQuery({ name: 'deviceOs', type: String})
   @Get("me")
   @ApiCreatedResponse({
     status: HttpStatus.CREATED,
@@ -46,10 +50,13 @@ export class AccountController {
   @ApiUnauthorizedResponse()
   async getAccountInfo(
     @Req() req,
-    @Res() res
+    @Res() res,
+    @Query('checkDevice') checkDevice: boolean,
+    @Query('deviceToken') deviceToken: string,
+    @Query('deviceOs') deviceOs: string,
   ) {
     const user = req.user;
-    return this.accountService.getAccountData(user)
+    return this.accountService.getAccountData(user,checkDevice,deviceToken,deviceOs)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

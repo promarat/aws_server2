@@ -3,17 +3,22 @@ import { UsersService } from "../users/users.service";
 import { RecordsService } from 'src/records/records.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from 'nestjs-config';
+import {notificationSettings}  from './notificationConfig';
+import PushNotifications from 'node-pushnotifications';
 
 @Injectable()
 export class MailService {
     private logger = new Logger(MailService.name);
+    private push: any;
+    private config: any;
     constructor(
         private readonly mailerService: MailerService,
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
         private readonly recordsService: RecordsService,
-        
     ) {
+        this.config = notificationSettings;
+        this.push = new PushNotifications(this.config);
     }
     
     public sentVerificationCode(code: string, email: string): any {
@@ -34,83 +39,36 @@ export class MailService {
             });
     }
 
-    public sentNotify(email: string, description: string, username: string): any {
-        return this
-            .mailerService
-            .sendMail({
-                to: email,
-                from: this.configService.get('app.smtp_mail'),
-                subject: 'Hi.',
-                template: './notice', // './' bugfix, undocumented in docs
-                context: {username, description},
+    public sentNotify(registrationIds, description): any {
+        let data = {title: 'Hi!', body: description, topic: 'org.RaiseYourVoice'};
+        return this.push
+            .send(registrationIds, data, (err,result)=>{
+                
             })
-            .then((success) => {
-                this.logger.log(success)
-            })
-            .catch((err) => {
-                this.logger.error(err)
-            });
     }
 
-    async sentNotifyToUsers(description: string, username: string){
-        const emails = await this.usersService.findEmails();
-        emails.map((email,index)=>{
-            this.mailerService
-            .sendMail({
-                to: email,
-                from: this.configService.get('app.smtp_mail'),
-                subject: 'Hi',
-                template: './notice', // './' bugfix, undocumented in docs
-                context: {username, description},
-            })
-            .then((success) => {
-                this.logger.log(success)
-            })
-            .catch((err) => {
-                this.logger.error(err)
-            });
-        })
+    async sentNotifyToUsers(description: string){
+        const deviceTokens = await this.usersService.findDevices();
+        this.sentNotify(deviceTokens, description);
     }
 
-    async sentNotifyToUsersHaveAnswer(description: string, username: string){
-        const emails = await this.usersService.findEmailsWithAnswer();
-        emails.map((email,index)=>{
-            this.mailerService
-            .sendMail({
-                to: email,
-                from: this.configService.get('app.smtp_mail'),
-                subject: 'Hi',
-                template: './notice', // './' bugfix, undocumented in docs
-                context: {username, description},
-            })
-            .then((success) => {
-                this.logger.log(success)
-            })
-            .catch((err) => {
-                this.logger.error(err)
-            });
-        })
+    async sentNotifyToUser(userId, description: string){
+        let usersId = [];
+        usersId.push(userId);
+        const deviceTokens = await this.usersService.findDevicesWithUser(usersId);
+        this.sentNotify(deviceTokens, description);
     }
 
-    async sentNotifyToFriends(userId: string, description: string, username: string){
+    async sentNotifyToUsersHaveAnswer(description: string){
+        const deviceTokens = await this.usersService.findDevicesWithAnswer();
+        this.sentNotify(deviceTokens, description);
+    }
+
+    async sentNotifyToFriends(userId: string, description: string){
         const findUsers = await this.recordsService.findUsersByFriendId(userId);
-        const emails = findUsers.map((user)=>user.user.email);
-        emails.map((email,index)=>{
-            this.mailerService
-            .sendMail({
-                to: email,
-                from: this.configService.get('app.smtp_mail'),
-                subject: 'Hi',
-                template: './notice', // './' bugfix, undocumented in docs
-                context: {username, description},
-            })
-            .then((success) => {
-                this.logger.log(success)
-            })
-            .catch((err) => {
-                this.logger.error(err)
-            });
-        })
+        const usersId = findUsers.map((user)=>user.user.id);
+        const deviceTokens = await this.usersService.findDevicesWithUser(usersId);
+       this.sentNotify(deviceTokens, description);
     }
 
 

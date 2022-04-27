@@ -19,6 +19,7 @@ import { ReactionsEntity } from 'src/entities/reaction.entity';
 import { MailService } from '../mail/mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { UsersService } from 'src/users/users.service';
+import { DevicesEntity } from 'src/entities/device.entity';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { UsersService } from 'src/users/users.service';
         UsersEntity,
         FriendsEntity,
         CountryEntity,
-        ReportsEntity
+        ReportsEntity,
+        DevicesEntity
       ]),
       NotificationsModule
   ],

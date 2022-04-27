@@ -7,6 +7,7 @@ import { RefreshTokenEntity } from "../entities/token.entity";
 import { PublicFileEntity } from "../entities/public-file.entity";
 import { RecordsEntity } from "src/entities/records.entity";
 import { AnswersEntity } from "src/entities/answers.entity";
+import { DevicesEntity } from 'src/entities/device.entity';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { AnswersEntity } from "src/entities/answers.entity";
         RefreshTokenEntity,
         PublicFileEntity,
         RecordsEntity,
-        AnswersEntity
+        AnswersEntity,
+        DevicesEntity
       ])
   ],
   providers: [UsersService],
