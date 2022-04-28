@@ -30,6 +30,7 @@ export class RecordsService {
     @InjectRepository(FriendsEntity) private friendsRepository: Repository<FriendsEntity>,
     private readonly filesService: FileService,
     private readonly usersService: UsersService,
+   // private readonly mailService: MailService
   ) {
     this.recordLimit = 5;
   }
@@ -393,7 +394,7 @@ export class RecordsService {
     entity.temporary = body.temporary;
     entity.category = body.category;
 
-   // this.mailService.sentNotifyToFriends(user.id,findUser.name,'Discover the new story of ');
+   // this.mailService.sentNotifyToFriends(user.id,`Discover the new story of ${findUser.name}`);
 
     return this.recordsRepository.save(entity);
   }

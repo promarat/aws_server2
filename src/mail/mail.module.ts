@@ -21,6 +21,7 @@ import { FriendsEntity } from "src/entities/friends.entity";
 import { TokenService } from 'src/auth/token/token.service';
 import { FileService } from 'src/files/file.service';
 import { DevicesEntity } from 'src/entities/device.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -70,7 +71,9 @@ import { DevicesEntity } from 'src/entities/device.entity';
     UsersService,
     MailService,
     RecordsService,
-    FileService
+    FileService,
+    AuthService,
+    TokenService
   ],
   exports: [MailService],
 })

@@ -4,21 +4,18 @@ import { RecordsService } from 'src/records/records.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from 'nestjs-config';
 import {notificationSettings}  from './notificationConfig';
-import PushNotifications from 'node-pushnotifications';
+import * as PushNotifications from 'node-pushnotifications';
 
 @Injectable()
 export class MailService {
     private logger = new Logger(MailService.name);
-    private push: any;
-    private config: any;
+    private push = new PushNotifications(notificationSettings);
     constructor(
         private readonly mailerService: MailerService,
         private readonly configService: ConfigService,
         private readonly usersService: UsersService,
         private readonly recordsService: RecordsService,
     ) {
-        this.config = notificationSettings;
-        this.push = new PushNotifications(this.config);
     }
     
     public sentVerificationCode(code: string, email: string): any {

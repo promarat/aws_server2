@@ -30,6 +30,7 @@ import { LikesEntity } from "src/entities/llikes.entity";
 import { ReactionsEntity } from "src/entities/reaction.entity";
 import { FriendsEntity } from "src/entities/friends.entity";
 import { DevicesEntity } from "src/entities/device.entity";
+import { MailModule } from "src/mail/mail.module";
 
 @Module({
   imports: [
@@ -47,7 +48,7 @@ import { DevicesEntity } from "src/entities/device.entity";
         ReactionsEntity,
         FriendsEntity,
         DevicesEntity
-      ])
+      ]),
   ],
   providers: [
     AuthService,
