@@ -159,7 +159,7 @@ export class UsersService {
       console.log("update++++++++++++++");
       if (findDevice.user.id != user.id) {
         const findUser = await this.getById(user.id);
-        return this.devicesRepository.update(findDevice.id, { user: findUser });
+        return await this.devicesRepository.update(findDevice.id, { user: findUser });
       }
     }
     else {
@@ -169,7 +169,7 @@ export class UsersService {
       entity.token = deviceToken;
       entity.os = deviceOs;
       entity.user = findUser;
-      return this.devicesRepository.save(entity);
+      return await this.devicesRepository.save(entity);
     }
   }
 
