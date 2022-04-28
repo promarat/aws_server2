@@ -27,7 +27,7 @@ export class AccountService {
     console.log(checkDevice+deviceToken+deviceOs+" +++++++++++++++++++");
     if(checkDevice){
       console.log("ooooooooooooooooooooooooooooo");
-      this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
+      await this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
         console.log(res+" ************************");
         const userDataQuery = this.usersService.findById(user.id);
         const limitsQuery = this.recordsService.getTodayCount(user);
