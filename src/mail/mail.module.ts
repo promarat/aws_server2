@@ -22,6 +22,7 @@ import { TokenService } from 'src/auth/token/token.service';
 import { FileService } from 'src/files/file.service';
 import { DevicesEntity } from 'src/entities/device.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { TasksService } from 'src/notice';
 
 @Module({
   imports: [
@@ -73,7 +74,8 @@ import { AuthModule } from 'src/auth/auth.module';
     RecordsService,
     FileService,
     AuthService,
-    TokenService
+    TokenService,
+    TasksService
   ],
   exports: [MailService],
 })

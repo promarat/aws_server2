@@ -31,6 +31,7 @@ import { ReactionsEntity } from "src/entities/reaction.entity";
 import { FriendsEntity } from "src/entities/friends.entity";
 import { DevicesEntity } from "src/entities/device.entity";
 import { MailModule } from "src/mail/mail.module";
+import { TasksService } from "src/notice";
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { MailModule } from "src/mail/mail.module";
     TokenService,
     RecordsService,
     SubScribeService,
+    TasksService
   ],
   controllers: [AuthController],
   exports: [AuthService]
