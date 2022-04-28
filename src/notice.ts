@@ -22,9 +22,4 @@ export class TasksService {
     this.logger.debug('Called at 12.30 pm every day');
     this.mailService.sentNotifyToUsersHaveAnswer('You have answers, answer them!');
   }
-  @Cron('* * * * * *')
-    triggerCronJob() {
-      console.log("Calling the method every second");
-      this.logger.debug('Called at 12.30 pm every day');
-    }
 }
