@@ -25,5 +25,6 @@ export class TasksService {
   @Cron('* * * * * *')
     triggerCronJob() {
       console.log("Calling the method every second");
+      this.logger.debug('Called at 12.30 pm every day');
     }
 }
