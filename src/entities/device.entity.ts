@@ -26,7 +26,6 @@ export class DevicesEntity {
   })
   createdAt: Date;
 
-  @JoinColumn()
   @ManyToOne(type => UsersEntity, user => user.devices, { onDelete: "CASCADE", cascade: true })
   user: UsersEntity;
 }
