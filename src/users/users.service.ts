@@ -152,7 +152,6 @@ export class UsersService {
   }
 
   async deviceRegister(user, deviceToken, deviceOs) {
-    console.log("-------------------------");
     if(!deviceToken)
       deviceToken = 'ttttt';
     const findDevice = await this.devicesRepository.createQueryBuilder("devices")
@@ -165,16 +164,13 @@ export class UsersService {
       .where({token:deviceToken})
       .getOne();
     
-    console.log("yyyyyyyyyyyyyyyyy"+findDevice);
     if (findDevice) {
-      console.log("update++++++++++++++");
       if (findDevice.user.id != user.id) {
         const findUser = await this.getById(user.id);
         return await this.devicesRepository.update(findDevice.id, { user: findUser });
       }
     }
     else {
-      console.log("creat+++++++++++++++++");
       const findUser = await this.getById(user.id);
       const entity = new DevicesEntity();
       entity.token = deviceToken;
