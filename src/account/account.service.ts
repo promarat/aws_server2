@@ -26,13 +26,20 @@ export class AccountService {
   async getAccountData(user, checkDevice, deviceToken, deviceOs) {
     console.log(checkDevice+deviceToken+deviceOs+" +++++++++++++++++++");
     if(checkDevice == true){
-      console.log("OOOOOOOOOOOOOOOOOOOOOOO");
-      this.usersService.deviceRegister(user,deviceToken, deviceOs);
+      console.log("ooooooooooooooooooooooooooooo");
+      this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
+        const userDataQuery = this.usersService.findById(user.id);
+        const limitsQuery = this.recordsService.getTodayCount(user);
+        const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
+        return { ...userData, ...limitData };
+          })
     }
-    const userDataQuery = this.usersService.findById(user.id);
-    const limitsQuery = this.recordsService.getTodayCount(user);
-    const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
-    return { ...userData, ...limitData };
+    else{
+      const userDataQuery = this.usersService.findById(user.id);
+      const limitsQuery = this.recordsService.getTodayCount(user);
+      const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
+      return { ...userData, ...limitData };
+    }
   }
   
   async resendCode(user) {
