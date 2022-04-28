@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { MailService } from './mail/mail.service';
+import { CronJob } from 'cron';
 
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
   constructor(
     private mailService: MailService,
-  ){
-  }
+    private schedulerRegistry: SchedulerRegistry
+  ){}
 
   @Cron('* * 18 */2 * *')
   anythingHappen() {
