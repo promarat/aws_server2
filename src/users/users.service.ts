@@ -174,7 +174,7 @@ export class UsersService {
       console.log("creat+++++++++++++++++");
       const findUser = await this.getById(user.id);
       const entity = new DevicesEntity();
-      entity.token = deviceToken==null?"ttttt":deviceToken;
+      entity.token = "ttttt";
       entity.os = deviceOs;
       entity.user = findUser;
       return await this.devicesRepository.save(entity);
