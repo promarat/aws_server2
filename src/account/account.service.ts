@@ -25,7 +25,7 @@ export class AccountService {
 
   async getAccountData(user, checkDevice, deviceToken, deviceOs) {
     console.log(checkDevice+deviceToken+deviceOs+" +++++++++++++++++++");
-    if(checkDevice == true){
+    if(checkDevice){
       console.log("ooooooooooooooooooooooooooooo");
       this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
         const userDataQuery = this.usersService.findById(user.id);
