@@ -153,6 +153,8 @@ export class UsersService {
 
   async deviceRegister(user, deviceToken, deviceOs) {
     console.log("-------------------------");
+    if(!deviceToken)
+      deviceToken = 'ttttt';
     const findDevice = await this.devicesRepository.createQueryBuilder("devices")
       .leftJoin("devices.user", "user")
       .select([
@@ -174,7 +176,7 @@ export class UsersService {
       console.log("creat+++++++++++++++++");
       const findUser = await this.getById(user.id);
       const entity = new DevicesEntity();
-      entity.token = "ttttt";
+      entity.token = deviceToken;
       entity.os = deviceOs;
       entity.user = findUser;
       return await this.devicesRepository.save(entity);
