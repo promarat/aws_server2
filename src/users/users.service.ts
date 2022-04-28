@@ -159,6 +159,7 @@ export class UsersService {
       .leftJoin("devices.user", "user")
       .select([
         "devices.token",
+        "devices.id",
         "user.id",
       ])
       .where({token:deviceToken})
