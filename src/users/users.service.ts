@@ -153,7 +153,13 @@ export class UsersService {
 
   async deviceRegister(user, deviceToken, deviceOs) {
     console.log("-------------------------");
-    const findDevice = await this.devicesRepository.findOne({ where: { token: deviceToken }, relations: ["user"] });
+    const findDevice = await this.devicesRepository.createQueryBuilder("devices")
+      .leftJoin("devices.user", "user")
+      .select([
+        "user.id",
+      ])
+      .getOne();
+    
     console.log("yyyyyyyyyyyyyyyyy"+findDevice);
     if (findDevice) {
       console.log("update++++++++++++++");
