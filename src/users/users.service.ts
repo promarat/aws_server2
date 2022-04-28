@@ -153,13 +153,16 @@ export class UsersService {
 
   async deviceRegister(user, deviceToken, deviceOs) {
     const findDevice = await this.devicesRepository.findOne({ where: { token: deviceToken }, relations: ["user"] });
+    console.log(findDevice);
     if (findDevice) {
+      console.log("update++++++++++++++");
       if (findDevice.user.id != user.id) {
         const findUser = await this.getById(user.id);
         return this.devicesRepository.update(findDevice.id, { user: findUser });
       }
     }
     else {
+      console.log("creat+++++++++++++++++");
       const findUser = await this.getById(user.id);
       const entity = new DevicesEntity();
       entity.token = deviceToken;
