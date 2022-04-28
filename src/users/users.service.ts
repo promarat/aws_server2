@@ -158,6 +158,7 @@ export class UsersService {
       .select([
         "user.id",
       ])
+      .where({user:user.id})
       .getOne();
     
     console.log("yyyyyyyyyyyyyyyyy"+findDevice);
