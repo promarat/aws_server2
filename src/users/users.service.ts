@@ -156,9 +156,10 @@ export class UsersService {
     const findDevice = await this.devicesRepository.createQueryBuilder("devices")
       .leftJoin("devices.user", "user")
       .select([
+        "devices.token",
         "user.id",
       ])
-      .where({user:user.id})
+      .where({token:deviceToken})
       .getOne();
     
     console.log("yyyyyyyyyyyyyyyyy"+findDevice);
@@ -173,7 +174,7 @@ export class UsersService {
       console.log("creat+++++++++++++++++");
       const findUser = await this.getById(user.id);
       const entity = new DevicesEntity();
-      entity.token = deviceToken;
+      entity.token = deviceToken==null?"ttttt":deviceToken;
       entity.os = deviceOs;
       entity.user = findUser;
       return await this.devicesRepository.save(entity);
