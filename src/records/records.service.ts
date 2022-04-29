@@ -82,12 +82,8 @@ export class RecordsService {
       // .take(take)
       .getMany();
     const userQueryBuilder = this.usersRepository.createQueryBuilder("users")
-      .leftJoin("users.avatar", "avatar")
-      .select([
-        "users.id",
-        "users.name",
-        "avatar.url"
-      ]);
+      
+    
     if( search != "")
       await userQueryBuilder.where("users.name ILIKE :titlesearch", {titlesearch: ''+ search + '%'})
     const users = await userQueryBuilder

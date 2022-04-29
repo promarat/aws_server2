@@ -169,6 +169,8 @@ export class UsersService {
         const findUser = await this.getById(user.id);
         return await this.devicesRepository.update(findDevice.id, { user: findUser });
       }
+      else
+        return 1;
     }
     else {
       const findUser = await this.getById(user.id);
