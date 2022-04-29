@@ -152,9 +152,10 @@ export class UsersService {
   }
 
   async deviceRegister(user, deviceToken, deviceOs) {
-    if(!deviceToken)
+    if(deviceToken == null)
       deviceToken = 'ttttt';
     console.log(deviceToken+' ***********************');
+    console.log(user.id);
     const findDevice = await this.devicesRepository.createQueryBuilder("devices")
       .leftJoin("devices.user", "user")
       .select([
@@ -168,6 +169,8 @@ export class UsersService {
     if (findDevice) {
       if (findDevice.user.id != user.id) {
         const findUser = await this.getById(user.id);
+        console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+        console.log(findDevice.id);
         return await this.devicesRepository.update(findDevice.id, { user: findUser });
       }
       else
