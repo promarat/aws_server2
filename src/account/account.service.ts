@@ -25,7 +25,7 @@ export class AccountService {
 
   async getAccountData(user, checkDevice, deviceToken, deviceOs) {
     console.log(checkDevice+" PPPPPPPPPPPPPPPPPPPP");
-    if(checkDevice){
+    if(checkDevice == true){
       console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
       console.log(deviceToken+" * "+ deviceOs);
       return await this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
