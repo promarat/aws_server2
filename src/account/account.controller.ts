@@ -38,7 +38,7 @@ export class AccountController {
   constructor(private accountService: AccountService) {
   }
 
-  @ApiQuery({ name: 'checkDevice', type: Boolean})
+  @ApiQuery({ name: 'checkDevice', type: String})
   @ApiQuery({ name: 'deviceToken', type: String})
   @ApiQuery({ name: 'deviceOs', type: String})
   @Get("me")
@@ -51,7 +51,7 @@ export class AccountController {
   async getAccountInfo(
     @Req() req,
     @Res() res,
-    @Query('checkDevice') checkDevice: boolean,
+    @Query('checkDevice') checkDevice: string,
     @Query('deviceToken') deviceToken: string,
     @Query('deviceOs') deviceOs: string,
   ) {
