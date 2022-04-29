@@ -115,8 +115,8 @@ export class UsersService {
     return tokens;
   }
 
-  createUser(newUser: UsersEntity): Promise<UsersEntity> {
-    return this.usersRepository.save(newUser);
+  async createUser(newUser: UsersEntity): Promise<UsersEntity> {
+    return await this.usersRepository.save(newUser);
   }
 
   completeRegister(findUser: UsersEntity) {
