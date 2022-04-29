@@ -31,7 +31,9 @@ export class AccountService {
       return await this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
         console.log("OOOOOOOOOOOOOOOOOOOOOOOOOO"+ user.id);
         const userDataQuery = this.usersService.findById(user.id);
+        console.log(userDataQuery);
         if( userDataQuery ){
+          console.log("RRRRRRRRRRRRRRRRRRRRRRRR");
           const limitsQuery = this.recordsService.getTodayCount(user);
           const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
           return { ...userData, ...limitData };
@@ -43,7 +45,9 @@ export class AccountService {
     }
     else{
       const userDataQuery = this.usersService.findById(user.id);
+      console.log(userDataQuery);
       if(userDataQuery){
+        console.log("YYYYYYYYYYYYYYYYYYYYYYYYY");
         const limitsQuery = this.recordsService.getTodayCount(user);
         const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
         return { ...userData, ...limitData };
