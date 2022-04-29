@@ -7,7 +7,7 @@ import { FileService } from "../files/file.service";
 import { FileTypeEnum } from "../lib/enum";
 import { GenderEnum } from "../lib/enum";
 import { EmailVerify, UsernameVerifyResponse } from "./dto/emailverify.dto";
-import { find } from "rxjs";
+import { ConnectableObservable, find } from "rxjs";
 import { UsersEntity } from "src/entities/users.entity";
 import { GeneratorUtil } from "../lib/generator-util";
 import * as bcrypt from 'bcryptjs';
@@ -24,11 +24,12 @@ export class AccountService {
   }
 
   async getAccountData(user, checkDevice, deviceToken, deviceOs) {
+    console.log(checkDevice+" PPPPPPPPPPPPPPPPPPPP");
     if(checkDevice){
       console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
       console.log(deviceToken+" * "+ deviceOs);
       return await this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
-        console.log("OOOOOOOOOOOOOOOOOOOOOOOOOO");
+        console.log("OOOOOOOOOOOOOOOOOOOOOOOOOO"+ user.id);
         const userDataQuery = this.usersService.findById(user.id);
         const limitsQuery = this.recordsService.getTodayCount(user);
         const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
