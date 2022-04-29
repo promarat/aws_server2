@@ -178,11 +178,16 @@ export class UsersService {
     }
     else {
       const findUser = await this.getById(user.id);
-      const entity = new DevicesEntity();
-      entity.token = deviceToken;
-      entity.os = deviceOs;
-      entity.user = findUser;
-      return await this.devicesRepository.save(entity);
+      if(findUser){
+        const entity = new DevicesEntity();
+        entity.token = deviceToken;
+        entity.os = deviceOs;
+        entity.user = findUser;
+        return await this.devicesRepository.save(entity);
+      }
+      else{
+        return 0;
+      }
     }
   }
 
