@@ -154,6 +154,7 @@ export class UsersService {
   async deviceRegister(user, deviceToken, deviceOs) {
     if(!deviceToken)
       deviceToken = 'ttttt';
+    console.log(deviceToken+' ***********************');
     const findDevice = await this.devicesRepository.createQueryBuilder("devices")
       .leftJoin("devices.user", "user")
       .select([

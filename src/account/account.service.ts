@@ -28,6 +28,7 @@ export class AccountService {
       console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
       console.log(deviceToken+" * "+ deviceOs);
       return await this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
+        console.log("OOOOOOOOOOOOOOOOOOOOOOOOOO");
         const userDataQuery = this.usersService.findById(user.id);
         const limitsQuery = this.recordsService.getTodayCount(user);
         const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
