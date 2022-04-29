@@ -30,12 +30,12 @@ export class AccountService {
       console.log(deviceToken+" * "+ deviceOs);
       return await this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
         console.log("OOOOOOOOOOOOOOOOOOOOOOOOOO"+ user.id);
-        const userDataQuery = this.usersService.findById(user.id);
-        console.log(userDataQuery);
-        if( userDataQuery ){
+        const userData = await this.usersService.findById(user.id);
+        console.log(userData);
+        if( userData ){
           console.log("RRRRRRRRRRRRRRRRRRRRRRRR");
-          const limitsQuery = this.recordsService.getTodayCount(user);
-          const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
+          const limitData = await this.recordsService.getTodayCount(user);
+    //      const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
           return { ...userData, ...limitData };
         }
         else
@@ -44,13 +44,13 @@ export class AccountService {
         )
     }
     else{
-      const userDataQuery = this.usersService.findById(user.id);
-      console.log(userDataQuery);
-      if(userDataQuery){
+      const userData = await this.usersService.findById(user.id);
+      console.log(userData);
+      if(userData){
         console.log("YYYYYYYYYYYYYYYYYYYYYYYYY");
-        const limitsQuery = this.recordsService.getTodayCount(user);
-        const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
-        return { ...userData, ...limitData };
+        const limitsData = this.recordsService.getTodayCount(user);
+ //       const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
+        return { ...userData, ...limitsData };
       }
       else
         return null;
