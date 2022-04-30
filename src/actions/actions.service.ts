@@ -165,9 +165,7 @@ export class ActionsService {
 
     const recordreactions = await this.getReactionsByIds([recordId]);
     const findReactions = filter(recordreactions, (obj) => obj.record.id === recordId);
-    console.log("@@@@@@@@@@@@@@@@");
-    console.log(findReactions);
-    if( !findReactions || findReactions.length == 0 ){
+    if( findReactions.length == 1 ){
       this.mailService.sentNotifyToUser(record.user.id,'Someone reacted to your story!');
     }
     const payload: any = {
