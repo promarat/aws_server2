@@ -7,7 +7,7 @@ export const notificationSettings = {
     // },
     apn: {
         token: {
-            key: './AuthKey_92M9UT64LX.p8', // optionally: fs.readFileSync('./certs/key.p8')
+            key: '~/aws_server2/AuthKey_92M9UT64LX.p8', // optionally: fs.readFileSync('./certs/key.p8')
             keyId: '92M9UT64LX',
             teamId: '8VYUDK97R2',
         },
