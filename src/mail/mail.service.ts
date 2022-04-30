@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from "../users/users.service";
 import { RecordsService } from 'src/records/records.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from 'nestjs-config';
 import {notificationSettings}  from './notificationConfig';
 import * as PushNotifications from 'node-pushnotifications';
@@ -38,9 +38,12 @@ export class MailService {
 
     public sentNotify(registrationIds, description): any {
         let data = {title: 'Hi!', body: description, topic: 'org.RaiseYourVoice'};
+        console.log(registrationIds[0]+' 333333333333333333333333');
         return this.push
             .send(registrationIds, data, (err,result)=>{
-                
+                console.log('4444444444444444444444');
+                console.log(err);
+                console.log(result);
             })
     }
 
@@ -53,6 +56,7 @@ export class MailService {
         let usersId = [];
         usersId.push(userId);
         const deviceTokens = await this.usersService.findDevicesWithUser(usersId);
+        console.log(deviceTokens[0]+' 11111111111111111111111');
         this.sentNotify(deviceTokens, description);
     }
 

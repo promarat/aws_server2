@@ -110,7 +110,7 @@ export class ActionsService {
         .into(LikesEntity)
         .values(like)
         .execute();
-      
+      console.log("000000000000000000 " + record.user.id);
       this.mailService.sentNotifyToUser(record.user.id,'Your vocal is popular!');
       if(record.likesCount + 1== 50){
         this.mailService.sentNotifyToUsers('Here is a story that might interest you 👀');
