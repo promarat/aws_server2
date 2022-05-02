@@ -100,19 +100,19 @@ export class UsersService {
       .select(["user.id"])
       .getMany();
     const usersId = users.map((user) => user.user.id);
-    return this.findDevicesWithUser(usersId);
+    return this.findDevicesWithUser([...new Set(usersId)]);
   }
 
-  async findDevicesWithUser(usersId) {
+  async findDevicesWithUser(ids) {
     const devices = await this.devicesRepository
       .createQueryBuilder("devices")
-      .innerJoin("devices.user", "user", "user.id in (:...usersId)", { usersId })
+      .innerJoin("devices.user", "user", "user.id in (:...ids)", { ids })
       .select([
         "devices.token"
       ])
       .getMany();
     const tokens = devices.map((item)=>item.token)
-    return tokens;
+    return [...new Set(tokens)];
   }
 
   async createUser(newUser: UsersEntity): Promise<UsersEntity> {

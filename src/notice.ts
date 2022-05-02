@@ -11,15 +11,16 @@ export class TasksService {
     private schedulerRegistry: SchedulerRegistry
   ){}
 
-  @Cron('18 */2 * *')
+  @Cron('0 0 18 */2 * *')
   anythingHappen() {
     this.logger.debug('Called at 6 pm every 2 days');
     this.mailService.sentNotifyToUsers('Anything happened to you today? Say it!');
   }
 
-  @Cron('30 12 * * *')
+  @Cron('0 * * * * *')
   answerThem() {
     this.logger.debug('Called at 12.30 pm every day');
     this.mailService.sentNotifyToUsersHaveAnswer('You have answers, answer them!');
+    console.log("URAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
   }
 }
