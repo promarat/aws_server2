@@ -9,18 +9,18 @@ export class TasksService {
   constructor(
     private mailService: MailService,
     private schedulerRegistry: SchedulerRegistry
-  ){}
-
-  @Cron('0 0 18 */2 * *')
-  anythingHappen() {
-    this.logger.debug('Called at 6 pm every 2 days');
-    this.mailService.sentNotifyToUsers('Anything happened to you today? Say it!');
+  ){
   }
 
-  @Cron('0 * * * * *')
-  answerThem() {
+  @Cron('16 */2 * *')
+  async anythingHappen() {
+    this.logger.debug('Called at 6 pm every 2 days');
+    await this.mailService.sentNotifyToUsers('Anything happened to you today? Say it!');
+  }
+
+  @Cron('30 10 * * *')
+  async answerThem() {
     this.logger.debug('Called at 12.30 pm every day');
-    this.mailService.sentNotifyToUsersHaveAnswer('You have answers, answer them!');
-    console.log("URAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    await this.mailService.sentNotifyToUsersHaveAnswer('You have answers, answer them!');
   }
 }

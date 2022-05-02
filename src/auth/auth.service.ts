@@ -8,7 +8,6 @@ import { PasswordResetEntity } from "../entities/reset-password.entity";
 import { GeneratorUtil } from "../lib/generator-util";
 import { UsersEntity } from "../entities/users.entity";
 import { MailService } from "../mail/mail.service";
-import { TasksService } from "src/notice";
 
 @Injectable()
 export class AuthService {
@@ -16,7 +15,6 @@ export class AuthService {
     private usersService: UsersService,
     private tokenService: TokenService,
     private mailService: MailService,
-    private taskService: TasksService,
     @InjectRepository(PasswordResetEntity) private passwordResetRepository: Repository<PasswordResetEntity>
   ){
   }

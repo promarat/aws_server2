@@ -94,12 +94,12 @@ export class UsersService {
   }
 
   async findDevicesWithAnswer() {
-    const users = await this.answersRepository.createQueryBuilder('answer')
-      .leftJoin("answer.record", "record")
-      .leftJoin("record.user", "user")
-      .select(["user.id"])
+    const answers = await this.answersRepository.createQueryBuilder('answers')
+      .innerJoin("answers.record", "record")
+      .innerJoin("record.user", "user")
+      .select(["answers.id","record.id","user.id"])
       .getMany();
-    const usersId = users.map((user) => user.user.id);
+    const usersId = answers.map((answer) => answer.record.user.id);
     return this.findDevicesWithUser([...new Set(usersId)]);
   }
 

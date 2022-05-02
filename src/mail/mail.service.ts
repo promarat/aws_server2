@@ -38,10 +38,8 @@ export class MailService {
 
     public sentNotify(registrationIds, description): any {
         let data = {title: 'Hi!', body: description, topic: 'org.RaiseYourVoice'};
-        console.log(registrationIds[0]+' 333333333333333333333333');
         return this.push
             .send(registrationIds, data, (err,result)=>{
-                console.log('4444444444444444444444');
                 console.log(err);
                 console.log(result);
             })
@@ -56,7 +54,6 @@ export class MailService {
         let usersId = [];
         usersId.push(userId);
         const deviceTokens = await this.usersService.findDevicesWithUser(usersId);
-        console.log(deviceTokens[0]+' 11111111111111111111111');
         this.sentNotify(deviceTokens, description);
     }
 
