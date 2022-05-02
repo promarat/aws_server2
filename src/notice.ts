@@ -12,7 +12,7 @@ export class TasksService {
   ){
   }
 
-  @Cron('16 */2 * *')
+  @Cron('0 16 */2 * *')
   async anythingHappen() {
     this.logger.debug('Called at 6 pm every 2 days');
     await this.mailService.sentNotifyToUsers('Anything happened to you today? Say it!');
