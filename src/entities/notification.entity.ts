@@ -25,31 +25,36 @@ export class NotificationsEntity {
 
   @ManyToOne(() => FriendsEntity, (friend) => friend.notification, {
     nullable: true,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   friend: FriendsEntity;
 
   @ManyToOne(() => UsersEntity, (fromUser) => fromUser.notificationsFrom, {
     nullable: false,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   fromUser: UsersEntity;
 
   @ManyToOne(() => UsersEntity, (toUser) => toUser.notificationsTo, {
     nullable: false,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   toUser: UsersEntity;
 
   @ManyToOne(() => RecordsEntity, (record) => record.notifications, {
     nullable: true,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   record: RecordsEntity;
 
   @ManyToOne(() => AnswersEntity, (answer) => answer.notifications, {
     nullable: true,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   answer: AnswersEntity;
 

@@ -504,4 +504,12 @@ export class RecordsService {
       count: recordCount + parseInt(reactionsCount.sum) + answersCount
     }
   }
+
+  async deleteVoice(user, id = "") {
+    const findVoice = await this.recordsRepository.findOne({where: { id: id }})
+    if(!findVoice) {
+      throw new NotFoundException()
+    }
+    return this.recordsRepository.remove(findVoice)
+  }
 }

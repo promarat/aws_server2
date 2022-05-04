@@ -45,7 +45,7 @@ export class AnswersEntity {
   @ManyToOne(type => UsersEntity, user => user.answers, { onDelete: "CASCADE", cascade: true })
   user: UsersEntity;
 
-  @ManyToOne(type => RecordsEntity, record => record.answers) //todo remove with record?
+  @ManyToOne(type => RecordsEntity, record => record.answers, { onDelete: "CASCADE", cascade: true }) //todo remove with record?
   record: RecordsEntity;
 
   @OneToMany(type => LikesEntity, likes => likes.answer) //todo remove with record?

@@ -25,19 +25,22 @@ export class LikesEntity {
 
   @ManyToOne(() => UsersEntity, (user) => user.likes, {
     nullable: false,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   user: UsersEntity;
 
   @ManyToOne(() => RecordsEntity, (record) => record.likes, {
     nullable: true,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   record: RecordsEntity;
 
   @ManyToOne(() => AnswersEntity, (answer) => answer.likes, {
     nullable: true,
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    cascade: true
   })
   answer: AnswersEntity;
 

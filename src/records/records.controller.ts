@@ -4,7 +4,7 @@ import {
   Get,
   HttpStatus,
   Logger, Param,
-  Post, Put, Query,
+  Post, Put, Query,Delete,
   Req,
   Res,
   UploadedFile,
@@ -177,6 +177,20 @@ export class RecordsController {
   ) {
     const user = req.user;
     return this.recordsService.getSeveralCounts(user, other)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'id', required: true, type: String, description: 'id of record'})
+  @Delete("deletevoice")
+  deleteNotification(
+    @Req() req,
+    @Res() res,
+    @Query('id') id: string,
+  ) {
+    const user = req.user;
+    return this.recordsService.deleteVoice(user, id)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }

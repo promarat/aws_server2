@@ -16,10 +16,10 @@ export class FriendsEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ManyToOne(() => UsersEntity, (user) => user.from, { onDelete: "CASCADE" })
+  @ManyToOne(() => UsersEntity, (user) => user.from, { onDelete: "CASCADE", cascade: true })
   user: UsersEntity;
 
-  @ManyToOne(() => UsersEntity, (user) => user.to, { onDelete: "CASCADE" })
+  @ManyToOne(() => UsersEntity, (user) => user.to, { onDelete: "CASCADE", cascade: true })
   friend: UsersEntity;
 
   @OneToMany(() => NotificationsEntity, (notification) => notification.friend)
