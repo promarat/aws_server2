@@ -10,21 +10,24 @@ import {
   Query,
   Req,
   Res,
-  Headers
+  Headers,
 } from "@nestjs/common";
 import { ExtractJwt } from "passport-jwt";
 import { AuthService } from "./auth.service";
-import { MailService } from "../mail/mail.service";
+import { MailsService } from "../mail/mail.service";
 import { TokenService } from "./token/token.service";
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { ForgotPassRequest } from "./dto/forgot-pass.request";
 import { RecoverRequest, ResetRequest } from "./dto/recover.request";
 import { LoginResponse } from "./dto/login.response";
 import { LoginRequest } from "./dto/login.request";
+import { AdminLoginRequest, AdminLoginResponse } from "../admin/dto/admin.response";
 import { SubScribeRequest } from "./dto/subscribe.request";
 import { SubScribeService } from "./subscripbe/subscribe.service"
 import { RecordsService } from "src/records/records.service";
 import { UsersService } from "../users/users.service";
+import { AdminService } from "../admin/admin.service";
+import { SessionRequest } from "./dto/session.request";
 
 @Controller()
 @ApiTags("auth")
@@ -33,11 +36,12 @@ export class AuthController {
 
   constructor(
     private authService: AuthService,
-    private mailService: MailService,
+    private mailService: MailsService,
     private tokenService: TokenService,
     private subScribeService: SubScribeService,
     private recordsService: RecordsService,
     private usersService: UsersService,
+    private adminService: AdminService
   ) {
   }
 
@@ -55,6 +59,48 @@ export class AuthController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Post("phoneRegister")
+  @ApiResponse({ status: HttpStatus.CREATED })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
+  async phoneRegister(
+    @Req() req,
+    @Res() res,
+    @Body() body: LoginRequest
+  ): Promise<LoginResponse> {
+    const reqIp = ""; //req.headers["x-real-ip"] || req.connection.remoteAddress;
+    return await this.authService.phoneRegister(body.phoneNumber)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("phoneLogin")
+  @ApiResponse({ status: HttpStatus.CREATED })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
+  async phoneLogin(
+    @Req() req,
+    @Res() res,
+    @Body() body: LoginRequest
+  ): Promise<LoginResponse> {
+    const reqIp = ""; //req.headers["x-real-ip"] || req.connection.remoteAddress;
+    return await this.authService.phoneLogin(body.phoneNumber)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("confirmPhoneNumber")
+  @ApiResponse({ status: HttpStatus.CREATED, description: "User data with jwt token", type: LoginResponse })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
+  async confirm(
+    @Req() req,
+    @Res() res,
+    @Body() body: LoginRequest
+  ): Promise<LoginResponse> {
+    const reqIp = ""; //req.headers["x-real-ip"] || req.connection.remoteAddress;
+    return await this.authService.confirmPhoneNumber(body.phoneNumber, body.verificationCode)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
   @Post("login")
   @ApiResponse({ status: HttpStatus.CREATED, description: "User data with jwt token", type: LoginResponse })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
@@ -65,13 +111,42 @@ export class AuthController {
   ): Promise<LoginResponse> {
     const reqIp = '';//req.headers["x-real-ip"] || req.connection.remoteAddress;
     const user = req.user;
-    return await this.authService.login(loginReq, reqIp, user)
+    return await this.authService.login(reqIp, user)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
-  @Put("refresh")
-  @ApiBearerAuth()
+  @Post("session")
+  @ApiResponse({ status: HttpStatus.CREATED})
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED})
+  async addSession(
+    @Req() req,
+    @Res() res,
+    @Body() sessionReq: SessionRequest
+  ): Promise<LoginResponse> {
+    return await this.authService.addSession(sessionReq)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  // @Post("token_verify")
+  // @ApiBearerAuth()
+  // @ApiResponse({ status: HttpStatus.CREATED, description: "User data with jwt token", type: LoginResponse })
+  // @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
+  // @ApiHeader({ name: "api_token", required: true })
+  // async tokenVerify(
+  //   @Headers("api_token") apiToken: string,
+  //   @Req() req,
+  //   @Res() res,
+  // ): Promise<LoginResponse> {
+  //   const reqIp = '';//req.headers["x-real-ip"] || req.connection.remoteAddress;
+  //   const decodedJwtAccessToken: JwtPayload = this.jwtService.decode(apiToken);
+  //   return await this.authService.verifyToken(decodedJwtAccessToken)
+  //     .then((data) => res.json(data))
+  //     .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  // }
+
+  @Post("refresh")
   @ApiResponse({ status: HttpStatus.CREATED, description: "User data with jwt token", type: LoginResponse })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   @ApiHeader({ name: "refresh-token", required: true })
@@ -187,12 +262,136 @@ export class AuthController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
-  @Get("getsubscribecount")
+  @Get("getsubscribeusercount")
   @ApiResponse({ status: HttpStatus.OK})
-  async getSubScribeCount(
+  async getSubScribeUserCount(
     @Res() res,
   ): Promise<SubScribeRequest> {
-    return await this.subScribeService.getSubScribeCount()
+    return await this.usersService.getSubScribeUserCount()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getnewusersthisweek")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getNewUsersThisWeek(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.usersService.getNewUsersThisWeek()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getuserscountmonth")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getUsersCountMonth(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.usersService.getUsersCountMonth()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getusersdaily")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getUsersDaily(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.usersService.getUsersDaily()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getvoicebycategory")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getVoiceByCategory(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.recordsService.getVoiceByCategory()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getpremiumusersbymonth")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getPremiumUsersByMonth(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.usersService.getPremiumUsersByMonth()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getdevicesbymonth")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getDevicesByMonth(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.usersService.getDevicesByMonth()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getlastvocals")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getLastVocals(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+  return await this.recordsService.getLastVocals()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getusersbycountry")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getUsersByCountry(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.usersService.getUsersByCountry()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getusersstatisticsbycountry")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getUsersStatisticsByCountry(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+    return await this.usersService.getUsersStatisticsByCountry()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getusers")
+  @ApiResponse({ status: HttpStatus.OK})
+  @ApiQuery({ name: "page", type: Number, required: true })
+  @ApiQuery({ name: "items_per_page", type: Number, required: true })
+  async getUsers(
+    @Res() res,
+    @Query("page") page: Number,
+    @Query("items_per_page") itemsPerPage: Number
+  ): Promise<SubScribeRequest> {
+  return await this.usersService.getUsers(page, itemsPerPage)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getrecordsgbyuser")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getRecords_ByUser(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+  return await this.recordsService.getRecords_ByUser()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getcountries")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getCountries(
+    @Res() res,
+  ): Promise<SubScribeRequest> {
+  return await this.usersService.getCountries()
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -256,4 +455,84 @@ export class AuthController {
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
+
+  // Dove add S@...
+  @Get("getuserinfo")
+  @ApiResponse({ status: HttpStatus.OK})
+  @ApiQuery({ name: "id", type: String, required: true })
+  async getUserInfo(
+    @Res() res,
+    @Query("id") userId: string
+  ) {
+    return this.usersService.getUserInfo(userId)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getusertransactionhistory")
+  @ApiResponse({ status: HttpStatus.OK})
+  @ApiQuery({ name: "id", type: String, required: true })
+  @ApiQuery({ name: "page", type: Number, required: true })
+  async getUserTransactionHistory(
+    @Res() res,
+    @Query("id") userId: string,
+    @Query("page") page: Number,
+  ) {
+    return this.usersService.getUserTransactionHistory(userId, page, 5)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getopenappcount")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getOpenAppCount(
+    @Res() res
+  ) {
+    return await this.usersService.getOpenAppCount()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getpersessiontime")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getPerSessionTime(
+    @Res() res
+  ) {
+    return await this.usersService.getPerSessionTime()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getinvitelinks")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getInviteLinks(
+    @Res() res
+  ) {
+    return await this.usersService.getInviteLinks()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("getsharestories")
+  @ApiResponse({ status: HttpStatus.OK})
+  async getShareStories(
+    @Res() res
+  ) {
+    return await this.usersService.getShareStories()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+  
+  @Get("generaterandomeusers")
+  @ApiResponse({ status: HttpStatus.OK})
+  @ApiQuery({ name: "number", type: Number, required: true })
+  async generateRandomeUsers(
+    @Res() res,
+    @Query("number") count: Number,
+  ) {
+    return await this.authService.generateRandomeUsers(count)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+  
 }

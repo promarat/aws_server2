@@ -17,7 +17,6 @@ export class GoogleAuthenticationService {
   ) {
     const clientID = this.configService.get('app.google_auth_client_id');
     const clientSecret = this.configService.get('app.google_auth_client_secret');
-
     this.oauthClient = new google.auth.OAuth2(
       clientID,
       clientSecret
@@ -58,7 +57,7 @@ export class GoogleAuthenticationService {
       throw new UnauthorizedException();
     }
 
-    const response = await this.authservice.login(null, "", user);
+    const response = await this.authservice.login("", user);
     return response;
   }
 
@@ -79,10 +78,16 @@ export class GoogleAuthenticationService {
 
     const user = await this.usersService.findOneByEmail(email);
     if (user){
-      return user;
+      return {
+        user,
+        isRegister: false
+      };
     }
     else{
-      return this.registerUser(token, email);
+      return {
+        user: await this.registerUser(token, email),
+        isRegister: true
+      }
     }
   }
 
@@ -91,10 +96,16 @@ export class GoogleAuthenticationService {
 
     const user = await this.usersService.findOneByEmail(email);
     if (user){
-      return user;
+      return {
+        user,
+        isRegister: false
+      }
     }
     else{
-      return this.registerUser(info.identityToken, email);
+      return {
+        user: await this.registerUser(info.identityToken, email),
+        isRegister: true
+      }
     }
   }
 }

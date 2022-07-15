@@ -30,9 +30,21 @@ export enum NotificationTypeEnum {
   FRIEND_ACCEPT = 'friendAccept',
   FRIEND_DELETE = 'friendDelete',
   USER_BLOCK = 'userBlock',
+  TAG_FRIEND = 'tagFriend'
 }
 
 export enum FileTypeEnum {
   AUDIO = 'audio',
   IMAGE = 'image',
+}
+
+export enum StoryTypeEnum {
+  RECORD = "record",
+  ANSWER = "answer",
+  REPLY_ANSWER = "replyAnswer"
+}
+
+export interface tagUser {
+  id:string,
+  name: string
 }

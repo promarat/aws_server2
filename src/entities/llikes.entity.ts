@@ -2,10 +2,14 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } f
 import { UsersEntity } from "./users.entity";
 import { RecordsEntity } from "./records.entity";
 import { AnswersEntity } from "./answers.entity";
+import { ReplyAnswersEntity } from "./reply-answer.entity";
+import { TagsEntity } from "./tag.entity";
 
 export enum LikeTypeEnum {
   RECORD = "record",
-  ANSWER = "answer"
+  ANSWER = "answer",
+  REPLY_ANSWER = "replyAnswer",
+  TAG_FRIEND = "tagFriend"
 }
 
 @Entity({ name: "likes" })
@@ -43,6 +47,20 @@ export class LikesEntity {
     cascade: true
   })
   answer: AnswersEntity;
+
+  @ManyToOne(() => ReplyAnswersEntity, (replyAnswer) => replyAnswer.likes, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true
+  })
+  replyAnswer: ReplyAnswersEntity;
+
+  @ManyToOne(() => TagsEntity, (tagFriend) => tagFriend.likes, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true
+  })
+  tagFriend: TagsEntity;
 
   @CreateDateColumn({
     type: "timestamp without time zone",

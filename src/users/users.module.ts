@@ -8,6 +8,7 @@ import { PublicFileEntity } from "../entities/public-file.entity";
 import { RecordsEntity } from "src/entities/records.entity";
 import { AnswersEntity } from "src/entities/answers.entity";
 import { DevicesEntity } from 'src/entities/device.entity';
+import { HistoryEntity } from 'src/entities/history.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { DevicesEntity } from 'src/entities/device.entity';
         PublicFileEntity,
         RecordsEntity,
         AnswersEntity,
-        DevicesEntity
+        DevicesEntity,
+        HistoryEntity
       ])
   ],
   providers: [UsersService],

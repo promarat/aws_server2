@@ -1,4 +1,5 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { MiddlewareConsumer, HttpModuleOptions, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { HttpService, HttpModule } from "@nestjs/axios";
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PassportModule } from "@nestjs/passport";
@@ -8,8 +9,10 @@ import { RefreshTokenEntity } from "../entities/token.entity";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { UsersService } from "../users/users.service";
 import { LocalStrategy } from "./strategies/local.strategy";
-import { MailService } from "../mail/mail.service";
+import { MailsService } from "../mail/mail.service";
 import { TokenService } from "./token/token.service";
+import { AdminService } from "../admin/admin.service";
+import { AdminEntity } from "../entities/admin.entity";
 import { JwtMiddleware } from "./middleware/jwt.middleware";
 import { LocalMiddleware } from "./middleware/local.middleware";
 import { PasswordResetEntity } from "../entities/reset-password.entity";
@@ -30,10 +33,19 @@ import { LikesEntity } from "src/entities/llikes.entity";
 import { ReactionsEntity } from "src/entities/reaction.entity";
 import { FriendsEntity } from "src/entities/friends.entity";
 import { DevicesEntity } from "src/entities/device.entity";
-import { MailModule } from "src/mail/mail.module";
+import { ReplyAnswersEntity } from "src/entities/reply-answer.entity";
+import { HistoryEntity } from "src/entities/history.entity";
+import { MailController } from "src/mail/mail.controller";
+import { ConfigModule, ConfigService } from "nestjs-config";
+
 
 @Module({
   imports: [
+    ConfigModule,
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
     PassportModule.register({defaultStrategy: "jwt"}),
     TypeOrmModule.forFeature(
       [
@@ -44,10 +56,13 @@ import { MailModule } from "src/mail/mail.module";
         SubScribeEntity,
         RecordsEntity,
         AnswersEntity,
+        ReplyAnswersEntity,
         LikesEntity,
         ReactionsEntity,
         FriendsEntity,
-        DevicesEntity
+        DevicesEntity,
+        AdminEntity,
+        HistoryEntity
       ]),
   ],
   providers: [
@@ -55,11 +70,12 @@ import { MailModule } from "src/mail/mail.module";
     LocalStrategy,
     JwtStrategy,
     UsersService,
-    MailService,
+    MailsService,
     FileService,
     TokenService,
     RecordsService,
     SubScribeService,
+    AdminService
   ],
   controllers: [AuthController],
   exports: [AuthService]
@@ -71,14 +87,30 @@ export class AuthModule implements NestModule {
       .exclude(
         {
           path: 'refresh',
-          method: RequestMethod.PUT,
+          method: RequestMethod.POST,
         },
         {
           path: 'login',
           method: RequestMethod.POST,
         },
         {
+          path: 'session',
+          method: RequestMethod.POST,
+        },
+        {
           path: 'register',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'phoneRegister',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'phoneLogin',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'confirmPhoneNumber',
           method: RequestMethod.POST,
         },
         {
@@ -110,7 +142,55 @@ export class AuthModule implements NestModule {
           method: RequestMethod.POST,
         },
         {
-          path: 'getsubscribecount',
+          path: 'getSubScribeUserCount',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getNewUsersThisWeek',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getuserscountmonth',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusersdaily',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getVoiceByCategory',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getpremiumusersbymonth',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getdevicesbymonth',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getlastvocals',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusersbycountry',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusersstatisticsbycountry',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusers',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getrecordsgbyuser',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getcountries',
           method: RequestMethod.GET,
         },
         {
@@ -136,6 +216,34 @@ export class AuthModule implements NestModule {
         {
           path: 'gettotalfriendrequest',
           method: RequestMethod.GET,
+        },
+        {
+          path: 'getuserinfo',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusertransactionhistory',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getopenappcount',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getpersessiontime',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getinvitelinks',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getsharestories',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'generaterandomeusers',
+          method: RequestMethod.GET,
         }
       )
       .forRoutes(
@@ -145,17 +253,34 @@ export class AuthModule implements NestModule {
         ActionsController,
         FilesController,
         RecordsController,
-        NotificationsController
+        NotificationsController,
+        MailController
       );
     consumer
       .apply(LocalMiddleware)
       .exclude(
         {
           path: 'refresh',
-          method: RequestMethod.PUT,
+          method: RequestMethod.POST,
         },
         {
           path: 'register',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'phoneRegister',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'phoneLogin',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'confirmPhoneNumber',
+          method: RequestMethod.POST,
+        },
+        {
+          path: 'session',
           method: RequestMethod.POST,
         },
         {
@@ -187,7 +312,55 @@ export class AuthModule implements NestModule {
           method: RequestMethod.POST,
         },
         {
-          path: 'getsubscribecount',
+          path: 'getSubScribeUserCount',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getNewUsersThisWeek',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getuserscountmonth',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusersdaily',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getVoiceByCategory',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getpremiumusersbymonth',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getdevicesbymonth',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getlastvocals',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusersbycountry',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusersstatisticsbycountry',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusers',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getrecordsgbyuser',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getcountries',
           method: RequestMethod.GET,
         },
         {
@@ -212,6 +385,34 @@ export class AuthModule implements NestModule {
         },
         {
           path: 'gettotalfriendrequest',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getuserinfo',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getusertransactionhistory',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getopenappcount',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getpersessiontime',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getinvitelinks',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'getsharestories',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'generaterandomeusers',
           method: RequestMethod.GET,
         }
       )

@@ -16,6 +16,8 @@ import { LikesEntity } from "./llikes.entity";
 import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
 import { ReportsEntity } from "./reports.entity";
+import { ReplyAnswersEntity } from "./reply-answer.entity";
+import { TagsEntity } from "./tag.entity";
 // import { ReactionsEntity } from "./reaction.entity";
 
 @Entity({ name: "answers" })
@@ -28,6 +30,12 @@ export class AnswersEntity {
 
   @Column({ nullable: true, default: 0 })
   likesCount: number;
+
+  @Column({ nullable: true , default: 0})
+  listenCount: number
+
+  @Column({ nullable: true , default: 0})
+  shareCount: number
 
   @Column({ nullable: true })
   emoji: string;
@@ -50,6 +58,12 @@ export class AnswersEntity {
 
   @OneToMany(type => LikesEntity, likes => likes.answer) //todo remove with record?
   likes: LikesEntity[];
+
+  @OneToMany(type => TagsEntity, tags => tags.answer) 
+  tags: TagsEntity[];
+
+  @OneToMany(type => ReplyAnswersEntity, replyAnswers => replyAnswers.answer) //todo remove with record?
+  replyAnswers: ReplyAnswersEntity[];
 
   // @OneToMany(type => ReactionsEntity, reactions => reactions.answer) //todo remove with record?
   // reactions: ReactionsEntity[];

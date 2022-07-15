@@ -7,8 +7,8 @@ import {notificationSettings}  from './notificationConfig';
 import * as PushNotifications from 'node-pushnotifications';
 
 @Injectable()
-export class MailService {
-    private logger = new Logger(MailService.name);
+export class MailsService {
+    private logger = new Logger(MailsService.name);
     private push = new PushNotifications(notificationSettings);
     constructor(
         private readonly mailerService: MailerService,
@@ -36,37 +36,52 @@ export class MailService {
             });
     }
 
-    public sentNotify(registrationIds, description): any {
-        let data = {title: 'Hi!', body: description, topic: 'org.RaiseYourVoice'};
+    public sendEmailToAdmin(type: string, user: string, email: string): any {
+        return this
+            .mailerService
+            .sendMail({
+                to: email,
+                from: this.configService.get('app.smtp_mail'),
+                subject: type === "subscribe" ? 'New User Is Registered' : "Premium User Is Registered!",
+                template: './index', // './' bugfix, undocumented in docs
+                context: {user},
+            })
+            .then((success) => {
+                this.logger.log(success)
+            })
+            .catch((err) => {
+                this.logger.error(err)
+            });
+    }
+
+    public sentNotify(registrationIds, description, params): any {
+        let data = {title: 'Vocco', body: description, topic: 'org.RaiseYourVoice', custom: params, invokeApp:false};
         return this.push
             .send(registrationIds, data, (err,result)=>{
                 console.log(err);
-                console.log(result);
             })
     }
 
-    async sentNotifyToUsers(description: string){
+    async sentNotifyToUsers(description, params){
         const deviceTokens = await this.usersService.findDevices();
-        this.sentNotify(deviceTokens, description);
+        this.sentNotify(deviceTokens, description, params);
     }
 
-    async sentNotifyToUser(userId, description: string){
-        let usersId = [];
-        usersId.push(userId);
+    async sentNotifyToUser(usersId, description, params){
         const deviceTokens = await this.usersService.findDevicesWithUser(usersId);
-        this.sentNotify(deviceTokens, description);
+        this.sentNotify(deviceTokens, description, params);
     }
 
-    async sentNotifyToUsersHaveAnswer(description: string){
+    async sentNotifyToUsersHaveAnswer(description, params){
         const deviceTokens = await this.usersService.findDevicesWithAnswer();
-        this.sentNotify(deviceTokens, description);
+        this.sentNotify(deviceTokens, description, params);
     }
 
-    async sentNotifyToFriends(userId: string, description: string){
+    async sentNotifyToFriends(userId, description, params){
         const findUsers = await this.recordsService.findUsersByFriendId(userId);
         const usersId = findUsers.map((user)=>user.user.id);
         const deviceTokens = await this.usersService.findDevicesWithUser(usersId);
-       this.sentNotify(deviceTokens, description);
+       this.sentNotify(deviceTokens, description,params);
     }
 
 

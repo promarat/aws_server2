@@ -16,16 +16,22 @@ import { NotificationsEntity } from '../entities/notification.entity';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { ReportsEntity } from 'src/entities/reports.entity';
 import { ReactionsEntity } from 'src/entities/reaction.entity';
-import { MailService } from '../mail/mail.service';
+import { MailsService } from '../mail/mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { UsersService } from 'src/users/users.service';
 import { DevicesEntity } from 'src/entities/device.entity';
+import { ReplyAnswersEntity } from 'src/entities/reply-answer.entity';
+import { TagsEntity } from 'src/entities/tag.entity';
+import { HistoryEntity } from 'src/entities/history.entity';
+import { MessagesEntity } from 'src/entities/message.entity';
+import { ConversationsEntity } from 'src/entities/conversations.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(
       [
         AnswersEntity,
+        ReplyAnswersEntity,
         LikesEntity,
         ReactionsEntity,
         RecordsEntity,
@@ -34,11 +40,15 @@ import { DevicesEntity } from 'src/entities/device.entity';
         FriendsEntity,
         CountryEntity,
         ReportsEntity,
-        DevicesEntity
+        DevicesEntity,
+        TagsEntity,
+        HistoryEntity,
+        MessagesEntity,
+        ConversationsEntity
       ]),
       NotificationsModule
   ],
-  providers: [ActionsService, FileService , UsersService, RecordsService, MailService],
+  providers: [ActionsService, FileService , UsersService, MailsService, RecordsService],
   controllers: [ActionsController]
 })
 export class ActionsModule {}

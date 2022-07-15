@@ -30,6 +30,13 @@ export class NotificationsEntity {
   })
   friend: FriendsEntity;
 
+  @ManyToOne(() => FriendsEntity, (friend) => friend.notification, {
+    nullable: true,
+    onDelete: "CASCADE",
+    cascade: true
+  })
+  towardFriend: FriendsEntity;
+
   @ManyToOne(() => UsersEntity, (fromUser) => fromUser.notificationsFrom, {
     nullable: false,
     onDelete: "CASCADE",

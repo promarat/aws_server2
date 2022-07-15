@@ -27,6 +27,7 @@ export class NotificationsService {
       .leftJoin('notifications.record', 'records')
       .leftJoin('notifications.answer', 'answers')
       .leftJoin('notifications.friend', 'friends')
+      .leftJoin('notifications.towardFriend', 'towardFriend')
       .select([
         'notifications.id',
         'notifications.type',
@@ -37,8 +38,13 @@ export class NotificationsService {
         'answers.id',
         'fromUser.id',
         'fromUser.name',
+        'fromUser.premium',
         'friends.id',
         'friends.status',
+        'towardFriend.id',
+        'towardFriend.status',
+        'fromUser.avatarNumber',
+        "fromUser.phoneNumber",
         'avatar.url'
         // 'fromUser.pseudo'
       ]);
@@ -95,15 +101,16 @@ export class NotificationsService {
     return queryBuilder.execute();
   }
 
-  async sendNotification(sender: UsersEntity, reciever: UsersEntity, record: RecordsEntity, answer: AnswersEntity, friend: FriendsEntity,  type: NotificationTypeEnum) {
+  async sendNotification(sender: UsersEntity, receiver: UsersEntity, record: RecordsEntity, answer: AnswersEntity, friend: FriendsEntity,  type: NotificationTypeEnum, towardFriend: FriendsEntity = null) {
     const notification = new NotificationsEntity();
     notification.type = type;
     notification.seen = false;
     notification.fromUser = sender;
-    notification.toUser = reciever;
+    notification.toUser = receiver;
     notification.record = record;
     notification.answer = answer;
     notification.friend = friend;
+    notification.towardFriend = towardFriend;
     return this.notificationRepository.save(notification);
   }
 

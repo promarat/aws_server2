@@ -38,7 +38,7 @@ export class NotificationsController {
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
   @ApiQuery({ name: 'id', required: true, type: String, description: 'id of record'})
   @Put("seen")
-  getAnswersByRecord(
+  setSeenNotification(
     @Req() req,
     @Res() res,
     @Query('id') id: string,

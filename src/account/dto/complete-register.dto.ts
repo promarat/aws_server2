@@ -24,6 +24,9 @@ export class CompleteRegisterDto {
   first: string;
 
   @ApiProperty()
+  bio: string;
+
+  @ApiProperty()
   last: string;
 
   @ApiProperty()

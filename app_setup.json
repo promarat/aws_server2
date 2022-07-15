@@ -1,48 +1,51 @@
 {
-  "app": {
-    "host": "127.0.0.1",
-    "port": 5432,
-    "domain": "https://ec2-18-117-55-156.us-east-2.compute.amazonaws.com",
-    "domain_description": "part of links files in database",
-    "backend_api_prefix": "",
-    "backend_api_prefix_description": "sets global prefix for all endpoints, example: ip:port/prefix/endpointName,  leave empty for ip:port/endpointName",
-    "access_token_ttl": 900000,
-    "refresh_token_ttl": 900000,
-    "token_secret": "TOKEN-SECRET-KEY",
-    "smtp_mail": "testemailsssender@gmail.com",
-    "smtp_host": "smtp.gmail.com",
-    "smtp_port": 465,
-    "smtp_tls": true,
-    "smtp_secure": false,
-    "smtp_user": "testemailsssender@gmail.com",
-    "smtp_pass": "aabzfwtsstwuygfa",
-    "aws_region": "us-east-2",
-    "aws_access_key_id": "AKIAT6XCKIXPY5WFGZ6M",
-    "aws_secret_access_key": "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",
-    "aws_public_bucket_name": "s3raise",
-    "google_auth_client_id":  "971245597385-m0an1nlhvq1456pcd6tkj136kpefppvn.apps.googleusercontent.com",
-    "google_auth_client_secret": "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"
-  },
-  
-  "database": {
-    "database_address": "34.79.60.221",
-    "database_port": 5432,
-    "database_name": "postgres",
-    "database_login": "postgres",
-    "database_password": "postgres"
-  },
-  "database2": {
-    "database_address": "database-1.crrqe8hk084t.us-east-2.rds.amazonaws.com",
-    "database_port": 5432,
-    "database_name": "social_voice",
-    "database_login": "postgres",
-    "database_password": "postgres"
-  },
-  "database1": {
-    "database_address": "127.0.0.1",
-    "database_port": 6432,
-    "database_name": "social_voice",
-    "database_login": "postgres",
-    "database_password": "postgres"
-  }
+    "app": {
+        "host": "127.0.0.1",
+        "port": 5432,
+        "domain": "https://ec2-18-117-55-156.us-east-2.compute.amazonaws.com",
+        "domain_description": "part of links files in database",
+        "backend_api_prefix": "",
+        "backend_api_prefix_description": "sets global prefix for all endpoints, example: ip:port/prefix/endpointName,  leave empty for ip:port/endpointName",
+        "access_token_ttl": 900000,
+        "refresh_token_ttl": 900000,
+        "token_secret": "TOKEN-SECRET-KEY",
+        "smtp_mail": "testemailsssender@gmail.com",
+        "smtp_host": "smtp.gmail.com",
+        "smtp_port": 465,
+        "smtp_tls": true,
+        "smtp_secure": false,
+        "smtp_user": "testemailsssender@gmail.com",
+        "smtp_pass": "aabzfwtsstwuygfa",
+        "aws_region": "us-east-2",
+        "aws_access_key_id": "AKIAT6XCKIXPY5WFGZ6M",
+        "aws_secret_access_key": "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",
+        "aws_public_bucket_name": "s3raise",
+        "google_auth_client_id": "971245597385-m0an1nlhvq1456pcd6tkj136kpefppvn.apps.googleusercontent.com",
+        "google_auth_client_secret": "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",
+        "twilio_server_sid": "VA03c294e7fd919907b4bb49e58c13a459",
+        "twilio_account_sid": "ACc30b0b326cb3985c23f6371f3b65b360",
+        "twilio_auth_token": "668431c3fd7bb2b60ba618e18bb3c629"
+    },
+
+    "database": {
+        "database_address": "34.163.112.187",
+        "database_port": 5432,
+        "database_name": "postgres",
+        "database_login": "postgres",
+        "database_password": "postgres"
+    },
+    "database2": {
+        "database_address": "database-1.crrqe8hk084t.us-east-2.rds.amazonaws.com",
+        "database_port": 5432,
+        "database_name": "social_voice",
+        "database_login": "postgres",
+        "database_password": "postgres"
+    },
+    "database1": {
+        "database_address": "127.0.0.1",
+        "database_port": 6432,
+        "database_name": "social_voice",
+        "database_login": "postgres",
+        "database_password": "postgres"
+    }
 }

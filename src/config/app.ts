@@ -21,5 +21,9 @@ export default {
     smtp_secure: config.app.smtp_secure,
     smtp_user: config.app.smtp_user,
     smtp_pass: config.app.smtp_pass,
-
+    google_auth_client_id: config.app.google_auth_client_id,
+    google_auth_client_secret: config.app.google_auth_client_secret,
+    twilio_server_sid: config.app.twilio_server_sid,
+    twilio_account_sid: config.app.twilio_account_sid,
+    twilio_auth_token: config.app.twilio_auth_token
 };

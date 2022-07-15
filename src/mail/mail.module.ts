@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { MailService } from './mail.service'
+import { MailsService } from './mail.service'
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from "../users/users.service";
 import { RecordsService } from '../records/records.service';
@@ -23,6 +23,10 @@ import { FileService } from 'src/files/file.service';
 import { DevicesEntity } from 'src/entities/device.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { TasksService } from 'src/notice';
+import { AdminService } from '../admin/admin.service';
+import { AdminEntity } from '../entities/admin.entity';
+import { ReplyAnswersEntity } from 'src/entities/reply-answer.entity';
+import { HistoryEntity } from 'src/entities/history.entity';
 
 @Module({
   imports: [
@@ -62,21 +66,24 @@ import { TasksService } from 'src/notice';
         SubScribeEntity,
         RecordsEntity,
         AnswersEntity,
+        ReplyAnswersEntity,
         LikesEntity,
         ReactionsEntity,
         FriendsEntity,
-        DevicesEntity
+        DevicesEntity,
+        AdminEntity,
+        HistoryEntity
       ]),
   ],
   providers: [
+    MailsService,
     UsersService,
-    MailService,
     RecordsService,
     FileService,
-    AuthService,
     TokenService,
-    TasksService
+    TasksService,
+    AdminService
   ],
-  exports: [MailService],
+  exports: [MailsService],
 })
 export class MailModule {}

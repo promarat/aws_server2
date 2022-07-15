@@ -2,6 +2,9 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { RecordsEntity } from "./records.entity";
 import { AnswersEntity } from "./answers.entity";
 import { FileTypeEnum } from "../lib/enum";
+import { UsersEntity } from "./users.entity";
+import { ReplyAnswersEntity } from "./reply-answer.entity";
+import { MessagesEntity } from "./message.entity";
 
 @Entity({ name: "s3_files" })
 export class PublicFileEntity {
@@ -30,5 +33,14 @@ export class PublicFileEntity {
 
   @OneToOne(type => AnswersEntity, answer => answer.file)
   answer: AnswersEntity;
+
+  @OneToOne(type => ReplyAnswersEntity, replyAnswer => replyAnswer.file)
+  replyAnswer: ReplyAnswersEntity;
+
+  @OneToOne(type => MessagesEntity, message => message.file)
+  message: MessagesEntity;
+
+  @OneToOne(type => UsersEntity, user => user.avatar)
+  user: UsersEntity;
 
 }

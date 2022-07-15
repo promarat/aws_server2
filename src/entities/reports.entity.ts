@@ -23,28 +23,28 @@ export class ReportsEntity {
   @ManyToOne(() => UsersEntity, (user) => user.reportFrom, {
     nullable: false,
     onDelete: "CASCADE",
-    cascade:true
+    cascade: true
   })
   reporter: UsersEntity;
 
   @ManyToOne(() => UsersEntity, (user) => user.reportTo, {
     nullable: true,
     onDelete: "CASCADE",
-    cascade:true
+    cascade: true
   })
   target: UsersEntity;
 
   @ManyToOne(() => RecordsEntity, (record) => record.reports, {
     nullable: true,
     onDelete: "CASCADE",
-    cascade:true
+    cascade: true
   })
   record: RecordsEntity;
 
   @ManyToOne(() => AnswersEntity, (answer) => answer.reports, {
     nullable: true,
     onDelete: "CASCADE",
-    cascade:true
+    cascade: true
   })
   answer: AnswersEntity;
 

@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { SubScribeEntity } from "../../entities/subscribe.entity";
+import { RecordsEntity } from "../../entities/records.entity";
 import { Repository } from "typeorm";
 import { SubScribeRequest } from "../dto/subscribe.request";
 
@@ -8,6 +9,7 @@ import { SubScribeRequest } from "../dto/subscribe.request";
 export class SubScribeService {
   constructor(
     @InjectRepository(SubScribeEntity) private subscribeRepository: Repository<SubScribeEntity>,
+    @InjectRepository(RecordsEntity) private recordsRepository: Repository<RecordsEntity>,
   ) {
   }
 
@@ -31,12 +33,5 @@ export class SubScribeService {
     const subscribe = new SubScribeEntity();
     subscribe.email = newUser.email;
     return this.subscribeRepository.save(subscribe);
-  }
-
-  async getSubScribeCount() {
-    const count = await this.subscribeRepository.count();
-    return {
-      count: count
-    };
   }
 }

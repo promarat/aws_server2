@@ -11,7 +11,7 @@ import { ConnectableObservable, find } from "rxjs";
 import { UsersEntity } from "src/entities/users.entity";
 import { GeneratorUtil } from "../lib/generator-util";
 import * as bcrypt from 'bcryptjs';
-import { MailService } from "src/mail/mail.service";
+import { MailsService } from "src/mail/mail.service";
 
 @Injectable()
 export class AccountService {
@@ -19,15 +19,15 @@ export class AccountService {
     private usersService: UsersService,
     private recordsService: RecordsService,
     private fileService: FileService,
-    private mailService: MailService
+    private mailService: MailsService
   ) {
   }
 
   async getAccountData(user, checkDevice, deviceToken, deviceOs) {
+    this.usersService.addOpenApp(user);
     if(checkDevice == 'reg'){
       return await this.usersService.deviceRegister(user,deviceToken, deviceOs).then (async res=>{
         const userData = await this.usersService.findById(user.id);
-        console.log(userData);
         if( userData ){
           const limitData = await this.recordsService.getTodayCount(user);
     //      const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
@@ -40,7 +40,6 @@ export class AccountService {
     }
     else{
       const userData = await this.usersService.findById(user.id);
-      console.log(userData);
       if(userData){
         const limitsData = this.recordsService.getTodayCount(user);
  //       const [userData, limitData] = await Promise.all([userDataQuery, limitsQuery]);
@@ -61,6 +60,7 @@ export class AccountService {
     const findUser = await this.usersService.findById(user.id);
     // findUser.pseudo = body.pseudo;
     findUser.dob = body.dob;
+    findUser.bio = body.bio;
     findUser.updatedAt = new Date();
     findUser.country = body.country;
     findUser.gender = <GenderEnum>body.gender;
@@ -72,12 +72,13 @@ export class AccountService {
     return this.usersService.completeRegister(findUser);
   }
 
-  async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
+  async addAvatar(userId: string, imageBuffer: Buffer, filename: string, avatarNumber: number) {
     const findUser = await this.usersService.getById(userId);
-    const avatar = await this.fileService.uploadFile(imageBuffer, filename, FileTypeEnum.IMAGE);
+    const avatar = imageBuffer?await this.fileService.uploadFile(imageBuffer, filename, FileTypeEnum.IMAGE):null;
     await this.usersService.updateAvatar(userId, {
       ...findUser,
-      avatar
+      avatar,
+      avatarNumber
     });
     return avatar;
   }
@@ -145,5 +146,9 @@ export class AccountService {
       };
       return payload;
     }
+  }
+
+  async deleteAccount(user) {
+    return await this.usersService.deleteUser(user);
   }
 }

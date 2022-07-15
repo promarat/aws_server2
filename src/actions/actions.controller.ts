@@ -19,12 +19,15 @@ import {
   ApiNotFoundResponse,
   ApiParam,
   ApiTags,
-  ApiQuery
+  ApiQuery,
+  ApiResponse
 } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileDto } from "../users/dto/file.dto";
 import { LikesRequestDto } from "./dto/likes.request.dto";
 import { ReportRequestDto } from "./dto/report.request";
+import { TagFriendsDto } from "src/users/dto/tagFriends.dto";
+import { MessageIds } from "./dto/message.ids";
 
 @Controller("actions")
 @ApiBearerAuth()
@@ -54,6 +57,171 @@ export class ActionsController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Post("tagFriends")
+  @ApiCreatedResponse({ status: HttpStatus.CREATED,  description: "" })
+  async tagFriends(
+    @Res() res,
+    @Req() req,
+    @Body() body: TagFriendsDto
+  ) {
+    const user = req.user;
+    return this.actionsService.tagFriends(user, body.storyId, body.storyType, body.tagUserIds, body.recordId, body.answerId)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'id', required: true, type: String, description: 'id of record'})
+  @Delete("deleteTag")
+  deleteTag(
+    @Req() req,
+    @Res() res,
+    @Query('id') id: string,
+  ) {
+    const user = req.user;
+    return this.actionsService.deleteTag(user, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("deleteMessages")
+  @ApiCreatedResponse({ status: HttpStatus.CREATED,  description: "" })
+  async deleteMessages(
+    @Res() res,
+    @Req() req,
+    @Body() body: MessageIds
+  ) {
+    return this.actionsService.deleteMessages(body.messageIds)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  
+
+  @ApiResponse ({ status: HttpStatus.OK })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'storyId', type: String})
+  @ApiQuery({ name: 'storyType', type: String})
+  @Get("getTags")
+  getTagsByStory(
+    @Req() req,
+    @Res() res,
+    @Query('storyId') storyId: string,
+    @Query('storyType') storyType: string,
+  ) {
+    const user = req.user;
+    return this.actionsService.getTags(user, storyId, storyType)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse ({ status: HttpStatus.OK })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'tagId', type: String})
+  @Get("getTagUsers")
+  getTagUsers(
+    @Req() req,
+    @Res() res,
+    @Query('tagId') tagId: string,
+  ) {
+    const user = req.user;
+    return this.actionsService.getTagUsers(user, tagId)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse ({ status: HttpStatus.OK })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @Get("getActiveUsers")
+  getActiveUsers(
+    @Req() req,
+    @Res() res,
+  ) {
+    const user = req.user;
+    return this.actionsService.getActiveUsers()
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse ({ status: HttpStatus.OK })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'toUserId', type: String})
+  @Get("getMessages")
+  getMessages(
+    @Req() req,
+    @Res() res,
+    @Query('toUserId') toUserId: string,
+  ) {
+    const user = req.user;
+    return this.actionsService.getMessages(user, toUserId)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse ({ status: HttpStatus.OK })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @ApiQuery({ name: 'toUserId', type: String})
+  @Get("confirmMessage")
+  confirmMessage(
+    @Req() req,
+    @Res() res,
+    @Query('toUserId') toUserId: string,
+  ) {
+    const user = req.user;
+    return this.actionsService.confirmMessage(user, toUserId)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @ApiResponse ({ status: HttpStatus.OK })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @Get("getConversations")
+  getConversations(
+    @Req() req,
+    @Res() res,
+  ) {
+    const user = req.user;
+    return this.actionsService.getConversations(user)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("answerReply")
+  @ApiConsumes("multipart/form-data")
+  @ApiCreatedResponse({ status: HttpStatus.CREATED, description: "The file has been uploaded" })
+  @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "answer not found" })
+  @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "you already replied" })
+  @UseInterceptors(FileInterceptor("file"))
+  async answerReply(
+    @Req() req,
+    @Res() res,
+    @UploadedFile() file,
+    @Body() body: FileDto
+  ) {
+    const user = req.user;
+    return this.actionsService.replyToAnswer(user, body.record, body.duration, file.buffer, file.originalname)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("addMessage")
+  @ApiConsumes("multipart/form-data")
+  @ApiCreatedResponse({ status: HttpStatus.CREATED, description: "The message has been created" })
+  @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "user not found" })
+  @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "Unknown err" })
+  @UseInterceptors(FileInterceptor("file"))
+  async addMessage(
+    @Req() req,
+    @Res() res,
+    @UploadedFile() file,
+    @Body() body: FileDto
+  ) {
+    const user = req.user;
+    return this.actionsService.addMessage(user, body, file)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
   @Post("answerappreciate")
   @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "answer not found" })
   @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "like exist" })
@@ -65,7 +233,7 @@ export class ActionsController {
     // @Param("id") answerId: string,
   ) {
     const user = req.user;
-    return this.actionsService.likeAnswer(user, body.id, body)
+    return this.actionsService.likeAnswer(user, body.id)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -81,7 +249,7 @@ export class ActionsController {
     // @Param("id") recordId: string
   ) {
     const user = req.user;
-    return this.actionsService.likeRecord(user, body.id, body)
+    return this.actionsService.likeRecord(user, body.id)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -132,6 +300,52 @@ export class ActionsController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Get("tagLike")
+  @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "tag not found" })
+  @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "tag not found" })
+  @ApiQuery({ name: 'id', type: String, required: true})
+  @ApiQuery({ name: 'isLike', type: String, required: true})
+  async likeTag(
+    @Req() req,
+    @Res() res,
+    @Query("id") tagId,
+    @Query("isLike") isLike,
+  ) {
+    const user = req.user;
+    return this.actionsService.likeTag(user, tagId, isLike)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("replyAnswerLike")
+  @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "answer not found" })
+  @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "like not found" })
+  @ApiQuery({ name: 'id', type: String, required: true})
+  async likeReplyAnswer(
+    @Req() req,
+    @Res() res,
+    @Query("id") replyAnswerId
+  ) {
+    const user = req.user;
+    return this.actionsService.likeReplyAnswer(user.id, replyAnswerId)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Get("replyAnswerUnlike")
+  @ApiNotFoundResponse({ status: HttpStatus.NOT_FOUND, description: "answer not found" })
+  @ApiBadRequestResponse({ status: HttpStatus.BAD_REQUEST, description: "like not found" })
+  @ApiQuery({ name: 'id', type: String, required: true})
+  async unLikeReplyAnswer(
+    @Req() req,
+    @Res() res,
+    @Query("id") replyAnswerId
+  ) {
+    const user = req.user;
+    return this.actionsService.unLikeReplyAnswer(user.id, replyAnswerId)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
 
   @Post("follow")
   @ApiParam({ name: "userid", required: true, type: String })
@@ -146,15 +360,69 @@ export class ActionsController {
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
+  @Post("deleteSuggest")
+  @ApiParam({ name: "userId", required: true, type: String })
+  async deleteSuggest(
+    @Req() req,
+    @Res() res,
+    @Query("userId") id: string
+  ) {
+    const user = req.user;
+    return this.actionsService.deleteSuggest(user, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("deleteFollower")
+  @ApiParam({ name: "userId", required: true, type: String })
+  async deleteFollower(
+    @Req() req,
+    @Res() res,
+    @Query("userId") id: string
+  ) {
+    const user = req.user;
+    return this.actionsService.removeFriend(id, user.id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("deleteFollowing")
+  @ApiParam({ name: "userId", required: true, type: String })
+  async deleteFollowing(
+    @Req() req,
+    @Res() res,
+    @Query("userId") id: string
+  ) {
+    const user = req.user;
+    return this.actionsService.removeFriend(user.id, id)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
+  @Post("inviteFriend")
+  @ApiParam({ name: "phoneNumber", required: true, type: String })
+  async inviteFriend(
+    @Req() req,
+    @Res() res,
+    @Query("phoneNumber") phoneNumber: string
+  ) {
+    const user = req.user;
+    return this.actionsService.inviteFriend(user, phoneNumber)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
   @Post("acceptfriend")
   @ApiParam({ name: "id", required: true, type: String })
+  @ApiParam({ name: "requestId", required: true, type: String })
   async addFriend(
     @Req() req,
     @Res() res,
-    @Query("id") id: string
+    @Query("id") id: string,
+    @Query("requestId") requestId: string
   ) {
     const user = req.user;
-    return this.actionsService.acceptFriend(user, id)
+    return this.actionsService.acceptFriend(user, id, requestId)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -167,7 +435,7 @@ export class ActionsController {
     @Query("id") id: string
   ) {
     const user = req.user;
-    return this.actionsService.removeFriend(user, id)
+    return this.actionsService.removeFriend(user.id, id)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -192,6 +460,17 @@ export class ActionsController {
     return this.actionsService.getAllCountries()
       .then((data) => res.json(data))
       .catch(err => !err.status ? console.log(err) : res.status(err.status).send(err.message));
+  }
+
+  @Get("shareLink")
+  async shareLink(
+    @Req() req,
+    @Res() res,
+  ) {
+    const user = req.user;
+    return this.actionsService.shareLink(user)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
 
   @Delete("record")

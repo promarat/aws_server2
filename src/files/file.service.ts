@@ -26,6 +26,7 @@ export class FileService {
     //   ACL:'public-read'
     // })
     //   .promise();
+
     const storage = new Storage({
       keyFilename: "./google-cloud-key.json"
     });
@@ -46,7 +47,7 @@ export class FileService {
     // createFileEntity.key = uploadResult.Key;
     // createFileEntity.url = uploadResult.Location;
     createFileEntity.key = fname;
-    createFileEntity.url = `https://storage.googleapis.com/${bucket.name}/${fname}`;
+    createFileEntity.url = `https://storage.googleapis.com/${bucket.name}/${encodeURIComponent(fname)}`;
     createFileEntity.type = type;
     createFileEntity.link = `${generateId}`;
     return this.publicFilesRepository.save(createFileEntity);

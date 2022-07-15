@@ -23,4 +23,17 @@ export class LoginRequest {
     })
     password: string;
 
+    @ApiProperty({
+        description: 'The user phoneNumber',
+        example: 'phoneNumber',
+        minimum: 8,
+    })
+    phoneNumber: string;
+
+    @ApiProperty({
+        description: 'The user phoneNumber verificationCode',
+        example: 'verificationCode',
+    })
+    verificationCode: string;
+
 }

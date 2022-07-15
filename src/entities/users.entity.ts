@@ -20,6 +20,11 @@ import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
 import { ReportsEntity } from "./reports.entity";
 import { ReactionsEntity } from "./reaction.entity";
+import { TagsEntity } from "./tag.entity";
+import { HistoryEntity } from "./history.entity";
+import { ReplyAnswersEntity } from "./reply-answer.entity";
+import { MessagesEntity } from "./message.entity";
+import { ConversationsEntity } from "./conversations.entity";
 
 @Entity({ name: "users" })
 @Index(["email"])
@@ -33,11 +38,20 @@ export class UsersEntity {
   @Column({ nullable: true })
   password: string;
 
-  @Column({ unique: true })
+  @Column({nullable: true, unique: true })
   email: string;
 
   @Column({ default: null })
   name: string;
+
+  @Column({ nullable: true, unique: true})
+  phoneNumber: string;
+
+  @Column({ default: false })
+  public isPhoneNumberConfirmed: boolean;
+
+  @Column({ default: null })
+  bio: string;
 
   @Column({ default: null })
   firstname: string;
@@ -79,9 +93,21 @@ export class UsersEntity {
     enum: PremiumEnum,
   })
   premium: PremiumEnum;
+
+  @Column({ nullable: true, default: 0,  })
+  avatarNumber: number;
   
   @Column({nullable: true})
   country: string;
+
+  @Column({ nullable: true , default: 0})
+  shareLinkCount: number
+
+  @Column({ nullable: true , default: 0})
+  openAppCount: number
+
+  @Column({ nullable: true , default: 0})
+  totalSession: number
   
   @Column({ default: false })
   isRegisteredWithGoogle: boolean;
@@ -104,18 +130,21 @@ export class UsersEntity {
   })
   updatedAt: Date;
 
+  @JoinColumn()
   @OneToOne(
-    () => PublicFileEntity,
+    type => PublicFileEntity, avatar => avatar.user,
     {
       eager: true,
       nullable: true
     }
   )
-  @JoinColumn()
-  public avatar?: PublicFileEntity;
+  avatar: PublicFileEntity;
 
   @OneToMany(type => RecordsEntity, records => records.user)
   records: RecordsEntity[];
+
+  @OneToMany(type => HistoryEntity, history => history.user)
+  history: HistoryEntity[];
 
   @OneToMany(type => DevicesEntity, devices => devices.user)
   devices: DevicesEntity[];
@@ -123,8 +152,20 @@ export class UsersEntity {
   @OneToMany(type => AnswersEntity, answers => answers.user)
   answers: AnswersEntity[];
 
+  @OneToMany(type => ReplyAnswersEntity, replyAnswers => replyAnswers.user)
+  replyAnswers: ReplyAnswersEntity[];
+
+  @OneToMany(type => MessagesEntity, sentMessages => sentMessages.user)
+  sentMessages: MessagesEntity[];
+
+  @OneToMany(type => MessagesEntity, receivedMessages => receivedMessages.toUser)
+  receivedMessages: MessagesEntity[];
+
   @OneToMany(type => LikesEntity, likes => likes.user)
   likes: LikesEntity[];
+
+  @OneToMany(type => TagsEntity, tags => tags.user)
+  tags: TagsEntity[];
 
   @OneToMany(type => ReactionsEntity, reactions => reactions.user)
   reactions: ReactionsEntity[];
@@ -132,8 +173,14 @@ export class UsersEntity {
   @OneToMany(type => FriendsEntity, from => from.user)
   from: FriendsEntity[];
 
-  @OneToMany(type => FriendsEntity, to => to.user)
+  @OneToMany(type => FriendsEntity, to => to.friend)
   to: FriendsEntity[];
+
+  @OneToMany(type => ConversationsEntity, firstConversation => firstConversation.sender)
+  firstConversation: ConversationsEntity[];
+
+  @OneToMany(type => ConversationsEntity, secondConversation => secondConversation.receiver)
+  secondConversation: ConversationsEntity[];
 
   @OneToMany(type => NotificationsEntity, notificationsTo => notificationsTo.toUser)
   notificationsTo: NotificationsEntity;

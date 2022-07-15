@@ -23,6 +23,7 @@
   "dependencies": {
     "@google-cloud/storage": "^5.18.2",
     "@nestjs-modules/mailer": "^1.6.0",
+    "@nestjs/axios": "^0.0.8",
     "@nestjs/common": "^8.0.6",
     "@nestjs/core": "^8.0.6",
     "@nestjs/passport": "^8.0.1",
@@ -58,6 +59,7 @@
     "rxjs": "^7.3.0",
     "swagger-ui-express": "^4.1.6",
     "ts-node-dev": "^1.1.8",
+    "twilio": "^3.77.3",
     "typeorm": "^0.2.37",
     "uuid": "^8.3.2"
   },

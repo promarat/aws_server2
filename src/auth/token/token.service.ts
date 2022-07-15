@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UsersService } from "../../users/users.service";
+import { AdminService } from "../../admin/admin.service";
 import { RefreshTokenEntity } from "../../entities/token.entity";
 import { ConfigService } from "nestjs-config";
 
@@ -21,7 +22,8 @@ export class TokenService {
 
   constructor(
     @InjectRepository(RefreshTokenEntity) private tokenRepository: Repository<RefreshTokenEntity>,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private adminService: AdminService
   ) {
     this.expiresInDefault = parseInt(ConfigService.get('app.access_token_ttl'), 10) || 60 * 5;
     this.jwtOptions = { expiresIn: this.expiresInDefault };
@@ -42,9 +44,8 @@ export class TokenService {
         throw new UnauthorizedException('Refresh token expired');
       }
       const oldPayload = await this.validateToken(oldAccessToken, true);
-      const userData = await this.usersService.findOneByIdForPayload(token.userId);
+      const userData = await this.adminService.findOneByIdForPayload(token.userId);
       const payload = {
-        pseudo: userData.pseudo,
         sub: userData.id,
         email: userData.email
       };

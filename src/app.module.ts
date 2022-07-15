@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from "nestjs-config";
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -52,7 +53,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     ActionsModule,
     NotificationsModule,
     GoogleAuthenticationModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    HttpModule
   ],
   controllers: [],
   providers: [],

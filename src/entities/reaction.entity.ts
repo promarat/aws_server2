@@ -15,14 +15,14 @@ export class ReactionsEntity {
   @ManyToOne(() => UsersEntity, (user) => user.reactions, {
     nullable: false,
     onDelete: "CASCADE",
-    cascade:true
+    cascade: true
   })
   user: UsersEntity;
 
   @ManyToOne(() => RecordsEntity, (record) => record.reactions, {
     nullable: true,
     onDelete: "CASCADE",
-    cascade:true
+    cascade: true
   })
   record: RecordsEntity;
 

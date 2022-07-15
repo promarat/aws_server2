@@ -30,8 +30,8 @@ import {
         @Res() res,
         @Body() tokenData: TokenVerificationDto
     ): Promise<LoginResponse> {
-        const user =  await this.authenticationService.authenticate(tokenData.token)
-        return await this.authService.login(null, "", user)
+        const {user, isRegister} =  await this.authenticationService.authenticate(tokenData.token)
+        return await this.authService.login("", user, isRegister)
         .then((data) => res.json(data))
         .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
     }
@@ -43,8 +43,8 @@ import {
         @Res() res,
         @Body() tokenData: AppleTokenVerificationDto
     ): Promise<LoginResponse> {
-        const user =  await this.authenticationService.appleAuthenticate(tokenData)
-        return await this.authService.login(null, "", user)
+        const {user, isRegister} =  await this.authenticationService.appleAuthenticate(tokenData)
+        return await this.authService.login( "", user, isRegister)
         .then((data) => res.json(data))
         .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
     }

@@ -17,7 +17,8 @@ import { NotificationsEntity } from "./notification.entity";
 import { ConfigService } from "nestjs-config";
 import { ReportsEntity } from "./reports.entity";
 import { ReactionsEntity } from "./reaction.entity";
-
+import { TagsEntity } from "./tag.entity";
+import { MessagesEntity } from "./message.entity";
 
 @Entity({ name: "records" })
 export class RecordsEntity {
@@ -46,6 +47,12 @@ export class RecordsEntity {
   likesCount: number
 
   @Column({ nullable: true , default: 0})
+  listenCount: number
+
+  @Column({ nullable: true , default: 0})
+  shareCount: number
+
+  @Column({ nullable: true , default: 0})
   reactionsCount: number
 
   @Column({ nullable: true })
@@ -69,6 +76,12 @@ export class RecordsEntity {
 
   @OneToMany(type => LikesEntity, likes => likes.record)
   likes: LikesEntity[];
+
+  @OneToMany(type => TagsEntity, tags => tags.record)
+  tags: TagsEntity[];
+
+  @OneToMany(type => MessagesEntity, messages => messages.record)
+  messages: MessagesEntity[];
 
   @OneToMany(type => ReactionsEntity, reactions => reactions.record)
   reactions: ReactionsEntity[];

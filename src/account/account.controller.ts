@@ -10,7 +10,8 @@ import {
   Res,
   UploadedFile,
   UseInterceptors,
-  Query
+  Query,
+  Delete
 } from "@nestjs/common";
 import { AccountService } from "./account.service";
 import {
@@ -19,7 +20,7 @@ import {
   ApiCreatedResponse,
   ApiOperation,
   ApiQuery,
-  ApiTags, ApiUnauthorizedResponse, ApiParam
+  ApiTags, ApiUnauthorizedResponse, ApiParam, ApiResponse
 } from "@nestjs/swagger";
 import { CompleteRegisterDto } from "./dto/complete-register.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -95,7 +96,7 @@ export class AccountController {
   @Post("changepremium")
   @ApiCreatedResponse({ status: HttpStatus.CREATED, type: UsersResponse, description: "Premium State Changed Correctly" })
   @ApiParam({ name: "premium_state", type: String, required: true })
-  async likeRecord(
+  async changePremium(
     @Req() req,
     @Res() res,
     @Query("premium_state") premium_state: string,
@@ -135,7 +136,7 @@ export class AccountController {
     @Body() body: AvatarDto
   ) {
     const user = req.user;
-    return this.accountService.addAvatar(user.id, file.buffer, file.originalname)
+    return this.accountService.addAvatar(user.id, file?.buffer, file?.originalname, body.avatarNumber)
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
@@ -199,4 +200,17 @@ export class AccountController {
       .then((data) => res.json(data))
       .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
   }
+
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Responses" })
+  @Delete("deleteAccount")
+  async deleteAccount(
+    @Req() req,
+    @Res() res,
+  ) {
+    const user = req.user;
+    return this.accountService.deleteAccount(user)
+      .then((data) => res.json(data))
+      .catch(err => !err.status ? this.logger.error(err) : res.status(err.status).send(err.response));
+  }
+
 }

@@ -11,9 +11,11 @@ import { AnswersEntity } from "../entities/answers.entity";
 import { LikesEntity } from "../entities/llikes.entity";
 import { FriendsEntity } from "../entities/friends.entity";
 import { ReactionsEntity } from 'src/entities/reaction.entity';
-import { MailService } from '../mail/mail.service';
+import { MailsService } from '../mail/mail.service';
 import { ActionsService } from 'src/actions/actions.service';
 import { DevicesEntity } from 'src/entities/device.entity';
+import { ReplyAnswersEntity } from 'src/entities/reply-answer.entity';
+import { HistoryEntity } from 'src/entities/history.entity';
 
 @Module({
   imports: [
@@ -23,13 +25,16 @@ import { DevicesEntity } from 'src/entities/device.entity';
         PublicFileEntity,
         UsersEntity,
         AnswersEntity,
+        ReplyAnswersEntity,
         LikesEntity,
         FriendsEntity,
         ReactionsEntity,
-        DevicesEntity
+        DevicesEntity,
+        HistoryEntity
       ])
   ],
-  providers: [RecordsService, FileService, UsersService , MailService ],
-  controllers: [RecordsController]
+  providers: [RecordsService, FileService, UsersService , MailsService ],
+  controllers: [RecordsController],
+  exports: [RecordsService],
 })
 export class RecordsModule {}
